@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Markdown Editor</title>
+
+<style>
+    body {
+        font-family: Arial;
+        margin: 0;
+        padding: 10px;
+    }
+    img {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+    textarea {
+        width: 100%;
+        height: 75vh;
+        font-size: 16px;
+        padding: 8px;
+        box-sizing: border-box;
+        resize: none;
+    }
+    select {
+        font-size: 16px;
+        padding: 4px;
+        margin-left: 10px;
+    }
+</style>
+
+<script>
+let historyStack = [];
+let redoStack = [];
+let textBox;
+
+window.onload = () => {
+    textBox = document.getElementById("editor");
+    textBox.addEventListener("input", () => {
+        historyStack.push(textBox.value);
+        redoStack = [];
+    });
+
+    // Intercept Ctrl+P / Cmd+P to print textarea only
+    window.addEventListener("keydown", function(e){
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+            e.preventDefault();
+            printText();
+        }
+    });
+};
+
+function undo() {
+    if (historyStack.length > 0) {
+        redoStack.push(textBox.value);
+        textBox.value = historyStack.pop();
+    }
+}
+
+function redo() {
+    if (redoStack.length > 0) {
+        historyStack.push(textBox.value);
+        textBox.value = redoStack.pop();
+    }
+}
+
+/* ================================
+       SIMPLE MARKDOWN PARSER WITH LINKS
+================================ */
+function mdToHtml(md) {
+    md = md.replace(/</g, "&lt;");
+
+    // Headers
+    md = md.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
+    md = md.replace(/^##### (.*$)/gim, "<h5>$1</h5>");
+    md = md.replace(/^#### (.*$)/gim, "<h4>$1</h4>");
+    md = md.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+    md = md.replace(/^## (.*$)/gim, "<h2>$1</h2>");
+    md = md.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+
+    // Bold
+    md = md.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    // Italic
+    md = md.replace(/\*(.*?)\*/g, "<i>$1</i>");
+    // Inline code
+    md = md.replace(/`([^`]+)`/g, "<code>$1</code>");
+    // Code blocks
+    md = md.replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
+    // Links [text](url)
+    md = md.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    // Lists
+    md = md.replace(/^\s*[-*] (.*)/gim, "<li>$1</li>");
+    md = md.replace(/(<li>[\s\S]*?<\/li>)/gim, "<ul>$1</ul>");
+    // Paragraphs
+    md = md.replace(/^\s*(.+)\s*$/gim, "<p>$1</p>");
+
+    return md;
+}
+
+/* ================================
+            PRINT TEXT
+================================ */
+function printText() {
+    const markdown = document.getElementById("editor").value;
+    const html = mdToHtml(markdown);
+    const font = document.getElementById("fontSelect").value;
+
+    const win = window.open("", "", "width=700,height=600");
+    win.document.write(`
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: ${font};
+                    padding: 20px;
+                    font-size: 16px;
+                }
+                pre {
+                    background: #eee;
+                    padding: 10px;
+                }
+                code {
+                    background: #ddd;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                }
+                a {
+                    color: blue;
+                    text-decoration: underline;
+                }
+            </style>
+        </head>
+        <body>${html}</body>
+        </html>
+    `);
+    win.document.close();
+    win.focus();
+    win.print();
+}
+
+/* ================================
+          DOWNLOAD FILE
+================================ */
+function downloadText() {
+    const text = document.getElementById("editor").value;
+    const blob = new Blob([text], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document.md"; // Save as Markdown
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+
+</head>
+<body>
+
+<!-- Home -->
+<a href="/"><img src="https://help.eclipse.org/latest/advanced/images/e_home.svg"></a>
+
+<!-- Undo -->
+<img onclick="undo()" src="https://help.eclipse.org/latest/advanced/images/toc_closed.svg">
+<img onclick="undo()" src="https://help.eclipse.org/latest/advanced/images/e_back.svg">
+
+<!-- Print -->
+<a href="javascript:printText()">
+    <img src="https://help.eclipse.org/latest/advanced/images/e_print_topic.svg"></a>
+
+<!-- Redo -->
+<img onclick="redo()" src="https://help.eclipse.org/latest/advanced/images/e_forward.svg">
+
+<!-- Download -->
+<a href="javascript:downloadText()">
+    <img src="https://help.eclipse.org/latest/topic/org.eclipse.help.base/doc/e_show_all.svg"></a>
+
+<!-- Font Dropdown -->
+<select id="fontSelect">
+    <option>Arial</option>
+    <option>Times New Roman</option>
+    <option>Courier New</option>
+    <option>Georgia</option>
+    <option>Verdana</option>
+    <option>Comic Sans MS</option>
+    <option>Trebuchet MS</option>
+    <option>Consolas</option>
+</select>
+
+<hr>
+
+<textarea id="editor" placeholder="Write using Markdown..."></textarea>
+
+</body>
+</html>
