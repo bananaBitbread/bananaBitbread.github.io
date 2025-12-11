@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plain Drawing Board (SVG Vector)</title>
+</head>
+<body>
+  <h3>Plain drawing board (vector SVG)</h3>
+
+  <div>
+    <label>Width: <input id="w" type="number" value="600" min="1"></label>
+    <label>Height: <input id="h" type="number" value="400" min="1"></label>
+    <button id="apply">Apply size</button>
+    <button id="clear">Clear</button>
+    <button id="savePng">Save PNG</button>
+    <input type="color" id="colorPicker" value="#000000">
+    <input type="range" id="brush" min="1" max="50" value="2">
+    <span id="brushVal">2</span>
+    <span id="recentColors"></span>
+    <button id="copyImg">Copy PNG</button>
+    <button id="copySVG">Copy SVG</button>
+    <button id="openData">Open data:image</button>
+  </div>
+
+  <p id="info">Canvas size: <span id="size">600 × 400</span></p>
+
+  <div style="position:relative; display:inline-block;">
+    <svg id="board" xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400" style="border:1px solid #000; display:block; touch-action:none;">
+      <g id="content"></g>
+    </svg>
+    <div id="handle" style="width:14px; height:14px; background:#999; position:absolute; right:0; bottom:0; cursor:se-resize;"></div>
+  </div>
+
+  <script>
+    const svg = document.getElementById('board');
+    const content = document.getElementById('content');
+    const wInput = document.getElementById('w');
+    const hInput = document.getElementById('h');
+    const applyBtn = document.getElementById('apply');
+    const clearBtn = document.getElementById('clear');
+    const savePngBtn = document.getElementById('savePng');
+    const colorPicker = document.getElementById('colorPicker');
+    const brush = document.getElementById('brush');
+    const brushVal = document.getElementById('brushVal');
+    const recentColorsEl = document.getElementById('recentColors');
+    const copyImgBtn = document.getElementById('copyImg');
+    const copySVGBtn = document.getElementById('copySVG');
+    const openDataBtn = document.getElementById('openData');
+    const sizeEl = document.getElementById('size');
+    const handle = document.getElementById('handle');
+
+    // Logical drawing coordinate system (viewBox)
+    const vb = { w: 600, h: 400 };
+    svg.setAttribute('viewBox', `0 0 ${vb.w} ${vb.h}`);
+
+    // State
+    let drawing = false;
+    let currentPath = null;
+    let color = colorPicker.value;
+    let lineWidth = parseInt(brush.value, 10);
+
+    // Recent colors (persisted) — only save when used on-board (on pointerdown)
+    const REC_KEY = 'plain_svg_recent_colors_v1';
+    let recentColors = JSON.parse(localStorage.getItem(REC_KEY) || '[]');
+
+    function updateRecentUI(){
+      recentColorsEl.innerHTML = '';
+      recentColors.slice(0,5).forEach(c => {
+        const s = document.createElement('button');
+        s.style.width='18px'; s.style.height='18px'; s.style.marginLeft='6px';
+        s.style.border='1px solid #000'; s.style.padding='0';
+        s.style.background = c; s.title = c; s.type='button';
+        s.onclick = () => { color = c; colorPicker.value = c; };
+        recentColorsEl.appendChild(s);
+      });
+    }
+    updateRecentUI();
+
+    // helpers: map client pointer to viewBox coords
+    function toVB(evt){
+      const r = svg.getBoundingClientRect();
+      const x = (evt.clientX - r.left) * (vb.w / r.width);
+      const y = (evt.clientY - r.top) * (vb.h / r.height);
+      return { x, y };
+    }
+
+    // Start a new path
+    function startPath(pt){
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d', `M ${pt.x} ${pt.y}`);
+      p.setAttribute('stroke', color);
+      p.setAttribute('stroke-width', lineWidth);
+      p.setAttribute('stroke-linecap', 'round');
+      p.setAttribute('stroke-linejoin', 'round');
+      p.setAttribute('fill', 'none');
+      p.setAttribute('vector-effect','non-scaling-stroke');
+      content.appendChild(p);
+      currentPath = p;
+    }
+
+    // Add point to path
+    function addPoint(pt){
+      if (!currentPath) return;
+      const d = currentPath.getAttribute('d');
+      currentPath.setAttribute('d', d + ` L ${pt.x} ${pt.y}`);
+    }
+
+    // Pointer events
+    svg.addEventListener('pointerdown', (e) => {
+      // ignore if resize handle captured
+      if (e.target === handle) return;
+      svg.setPointerCapture(e.pointerId);
+      drawing = true;
+      color = colorPicker.value;
+      lineWidth = parseInt(brush.value, 10);
+
+      // Save color to recent only once it actually makes a cameo on the board
+      if (!recentColors.includes(color)){
+        // we'll add it now (on pointerdown) — this ensures it was chosen and used
+        recentColors.unshift(color);
+        if (recentColors.length>5) recentColors.pop();
+        localStorage.setItem(REC_KEY, JSON.stringify(recentColors));
+        updateRecentUI();
+      }
+
+      const pt = toVB(e);
+      startPath(pt);
+    });
+
+    svg.addEventListener('pointermove', (e) => {
+      if (!drawing) return;
+      const pt = toVB(e);
+      addPoint(pt);
+    });
+
+    svg.addEventListener('pointerup', (e) => {
+      drawing = false;
+      currentPath = null;
+      try { svg.releasePointerCapture(e.pointerId); } catch(_){}
+    });
+
+    // Clear board
+    clearBtn.addEventListener('click', () => { content.innerHTML = ''; });
+
+    // Brush size UI
+    brush.addEventListener('input', ()=>{ brushVal.textContent = brush.value; });
+
+    // Recent colors are not added until used above. Also allow color picker change without saving.
+
+    // Apply size (sets displayed size only — viewBox stays the same so drawing scales visually)
+    function setInfo(){ sizeEl.textContent = svg.clientWidth + ' × ' + svg.clientHeight; wInput.value = svg.clientWidth; hInput.value = svg.clientHeight; }
+    setInfo();
+
+    applyBtn.addEventListener('click', ()=>{
+      const newW = Math.max(1, parseInt(wInput.value,10)||1);
+      const newH = Math.max(1, parseInt(hInput.value,10)||1);
+      svg.style.width = newW + 'px';
+      svg.style.height = newH + 'px';
+      setInfo();
+    });
+
+    // Drag resize handle (changes displayed size)
+    let resizing = false;
+    handle.addEventListener('pointerdown', (e)=>{ resizing=true; handle.setPointerCapture(e.pointerId); });
+    handle.addEventListener('pointermove', (e)=>{
+      if (!resizing) return;
+      const r = svg.getBoundingClientRect();
+      let newW = e.clientX - r.left;
+      let newH = e.clientY - r.top;
+      newW = Math.max(10, Math.round(newW)); newH = Math.max(10, Math.round(newH));
+      svg.style.width = newW + 'px'; svg.style.height = newH + 'px';
+      setInfo();
+    });
+    handle.addEventListener('pointerup', ()=>{ resizing=false; });
+
+    // Copy SVG to clipboard (as text)
+    copySVGBtn.addEventListener('click', async ()=>{
+      const clone = svg.cloneNode(true);
+      // give explicit width/height in exported SVG equal to displayed size
+      clone.setAttribute('width', svg.clientWidth);
+      clone.setAttribute('height', svg.clientHeight);
+      const s = new XMLSerializer().serializeToString(clone);
+      try { await navigator.clipboard.writeText(s); } catch(err){ console.error(err); alert('Copy failed: '+err); }
+    });
+
+    // Convert SVG text to Image then copy PNG to clipboard or download
+    async function svgToPngBlob(svgText, width, height){
+      return new Promise((res, rej)=>{
+        const img = new Image();
+        const svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+        img.onload = ()=>{
+          const c = document.createElement('canvas');
+          c.width = width; c.height = height;
+          const cx = c.getContext('2d');
+          // draw white background to avoid transparency if desired
+          // cx.fillStyle = '#fff'; cx.fillRect(0,0,width,height);
+          cx.drawImage(img, 0,0, width, height);
+          c.toBlob(blob => { res(blob); }, 'image/png');
+        };
+        img.onerror = (e)=> rej(e);
+        img.src = svgUrl;
+      });
+    }
+
+    // Copy PNG
+    copyImgBtn.addEventListener('click', async ()=>{
+      const clone = svg.cloneNode(true);
+      clone.setAttribute('width', svg.clientWidth);
+      clone.setAttribute('height', svg.clientHeight);
+      const s = new XMLSerializer().serializeToString(clone);
+      try {
+        const blob = await svgToPngBlob(s, svg.clientWidth, svg.clientHeight);
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      } catch(err){ console.error(err); alert('Copy PNG failed: '+err); }
+    });
+
+    // Save PNG (download)
+    savePngBtn.addEventListener('click', async ()=>{
+      const clone = svg.cloneNode(true);
+      clone.setAttribute('width', svg.clientWidth);
+      clone.setAttribute('height', svg.clientHeight);
+      const s = new XMLSerializer().serializeToString(clone);
+      try {
+        const blob = await svgToPngBlob(s, svg.clientWidth, svg.clientHeight);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'drawing.png';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch(err){ console.error(err); alert('Save PNG failed: '+err); }
+    });
+
+    // Open data:image of SVG in new tab
+    openDataBtn.addEventListener('click', ()=>{
+      const clone = svg.cloneNode(true);
+      clone.setAttribute('width', svg.clientWidth);
+      clone.setAttribute('height', svg.clientHeight);
+      const s = new XMLSerializer().serializeToString(clone);
+      const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+      window.open(url, '_blank');
+    });
+
+  </script>
+</body>
+</html>
