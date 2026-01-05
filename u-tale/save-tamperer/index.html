@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flowey's Time Machine</title>
+    <script src="lib/FileSaver.min.js"></script>
+    <script src="presets/presets.js"></script>
+    <script src="presets/ruins-start.js"></script>
+    <script src="presets/sans-battle.js"></script>
+    <script src="presets/undyne-the-undying.js"></script>
+    <script src="presets/asgore-normal.js"></script>
+    <script src="presets/asgore-true.js"></script>
+    <script src="presets/omega-flowey.js"></script>
+    <script src="presets/true-pacifist.js"></script>
+    <script src="flags.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+
+  <body>
+    <nav class="grid-cols-7">
+      <div class="col-span-2">
+        <p>Built-in Presets</p>
+        <div class="grid-cols-4 mt-1.5">
+          <select id="builtinpresetselect" class="col-span-3"></select>
+          <button id="builtinpresetload">Load</button>
+        </div>
+
+        <div class="grid-cols-2 mt-1.5">
+          <button
+            title="When this file is present, the world is in the 'deleted' state that is triggered when you complete a genocide run."
+            id="savesi2"
+          >
+            <span>sys_info_962</span>
+          </button>
+          <button
+            title="When this file is present, you have 'sold' your soul to get the world back after a genocide run."
+            id="savesi3"
+          >
+            <span>sys_info_963</span>
+          </button>
+        </div>
+      </div>
+
+      <header class="col-span-3">
+        <img src="res/flowey_nice.png" draggable="false" id="floweyimg" alt="floweyimg">
+        <h1 style="margin-left: 0.5rem">Flowey's<br>Time<br>Machine</h1>
+      </header>
+
+      <div class="col-span-2">
+        <p>Your Presets</p>
+        <div class="grid-cols-4 mt-1.5">
+          <select id="userpresetselect" class="col-span-2"></select>
+          <button class="disabled" id="userpresetload">Load</button>
+          <button class="disabled" id="userpresetsave">Save</button>
+
+          <div class="grid-cols-3 col-span-4">
+            <button id="userpresetnew">New</button>
+            <button class="disabled" id="userpresetdelete">Delete</button>
+            <button class="disabled" id="userpresetexport">Export</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="flex" style="margin-top: 0.25rem; gap: 0.5rem; justify-content: space-between;">
+      <a href="help.html">What is this?</a>
+      <div class="checkbox">
+        <input id="mute" type="checkbox" />
+        <label for="mute">Mute</label>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem;">
+      <div>
+        <h1>Persistent Data (undertale.ini)</h1>
+        <p>Things that UNDERTALE remembers throughout multiple playthroughs</p>
+      </div>
+
+      <section>
+        <fieldset>
+          <legend>General</legend>
+          <div class="grid-cols-3">
+            <label for="ini-file">
+              <img src="res/heart.svg" /><span>FILE</span>
+            </label>
+            <input id="ini-file" type="file" class="hidden" />
+            <button id="ini-loadbutton" class="disabled">
+              <img src="res/load.png" /><span>LOAD</span>
+            </button>
+            <button id="ini-savebutton">
+              <img src="res/star.png" /><span>SAVE</span>
+            </button>
+            
+            <label for="ini-name">Name</label>
+            <input
+              id="ini-name"
+              class="col-span-3"
+              placeholder="Name the fallen human"
+              type="text"
+              autocomplete="off"
+            />
+            <label for="ini-fun">Fun</label>
+            <label for="ini-love">LOVE</label>
+            <label for="ini-kills">Kills</label>
+            <input
+              id="ini-fun"
+              placeholder="Fun"
+              type="number"
+              autocomplete="off"
+            />
+            <input
+              id="ini-love"
+              placeholder="LOVE"
+              type="number"
+              autocomplete="off"
+            />
+            <input
+              id="ini-kills"
+              placeholder="Kills"
+              type="number"
+              autocomplete="off"
+            />
+            <label for="ini-location">Location</label>
+          </div>
+          <div class="grid-cols-4">
+            <input
+            id="ini-location-num"
+            min="0"
+            placeholder="ID"
+            type="number"
+            autocomplete="off"
+            />
+            <select
+            class="col-span-3 w-full"
+            id="ini-location"
+            ></select>
+          </div>
+          <div class="grid-cols-2 mt-1.5">
+            <label for="allowed-locations">Filter rooms:</label>
+            <select id="allowed-locations"></select>
+          </div>
+        </fieldset>
+
+        <div class="flex">
+          <fieldset class="w-full">
+            <legend>Omega Flowey & Other</legend>
+            <div class="grid">
+              <label for="ini-omega-flowey-deaths">Times you died</label>
+              <input
+                id="ini-omega-flowey-deaths"
+                placeholder="Times you died"
+                type="number"
+                autocomplete="off"
+              />
+              <label for="ini-omega-flowey-soul">Upcoming soul fight</label>
+              <select
+                title="Upcoming soul fight"
+                id="ini-omega-flowey-soul"
+                class="w-full"
+              ></select>
+              <div class="checkbox">
+                <input id="ini-omega-flowey-trapped" type="checkbox" />
+                <label 
+                  title="Trapped in Flowey's World"
+                  for="ini-omega-flowey-trapped"
+                  >Trapped in Flowey's World</label
+                >
+              </div>
+              <div class="checkbox" style="margin-top: -1px">
+                <input id="ini-dodged-all-special-thanks" type="checkbox" />
+                <label for="ini-dodged-all-special-thanks">Dodged special thanks</label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </section>
+
+      <div class="mt-6">
+        <h1>SAVE Data (file0)</h1>
+        <p>This is what gets SAVED at SAVE points</p>
+      </div>
+
+      <section>
+        <fieldset>
+          <legend>General</legend>
+          <div class="grid-cols-3">
+            <label for="sav-file">
+              <img src="res/heart.svg" /><span>FILE</span>
+            </label>
+            <input id="sav-file" type="file" class="hidden" />
+            <button id="sav-loadbutton" class="disabled">
+              <img src="res/load.png" /><span>LOAD</span>
+            </button>
+            <button id="sav-savebutton">
+              <img src="res/star.png" /><span>SAVE</span>
+            </button>
+            <label for="sav-name">Name</label>
+            <input
+              id="sav-name"
+              class="col-span-3"
+              placeholder="Name the fallen human"
+              type="text"
+              autocomplete="off"
+            />
+            <label for="sav-fun">Fun</label>
+            <label for="sav-love">LOVE</label>
+            <label for="sav-kills">Kills</label>
+            <input
+              id="sav-fun"
+              placeholder="Fun"
+              type="number"
+              autocomplete="off"
+            />
+            <input
+              id="sav-love"
+              placeholder="LOVE"
+              type="number"
+              autocomplete="off"
+            />
+            <input
+              id="sav-kills"
+              placeholder="Kills"
+              type="number"
+              autocomplete="off"
+            />
+            <label for="sav-location">Location</label>
+          </div>
+          <div class="grid-cols-4">
+            <input
+            id="sav-location-num"
+            min="0"
+            placeholder="ID"
+            type="number"
+            autocomplete="off"
+            />
+            <select
+            class="col-span-3 w-full"
+            id="sav-location"
+            ></select>
+          </div>
+          <div class="grid-cols-2 mt-1.5">
+            <label for="allowed-locations-2">Filter rooms:</label>
+            <select id="allowed-locations-2"></select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Stats</legend>
+          <div class="grid-cols-3">
+            <label for="sav-hp">HP</label>
+            <label for="sav-exp">EXP</label>
+            <label for="sav-gold">Gold</label>
+            <input id="sav-hp" type="number" autocomplete="off" />
+            <input id="sav-exp" type="number" autocomplete="off" />
+            <input id="sav-gold" type="number" autocomplete="off" />
+            <label for="sav-at">ATK</label>
+            <label class="col-span-2" for="sav-weaponat">Weapon ATK</label>
+            <input id="sav-at" type="number" autocomplete="off" />
+            <input
+              id="sav-weaponat"
+              class="col-span-2"
+              type="number"
+              autocomplete="off"
+            />
+            <label for="sav-df">DF</label>
+            <label class="col-span-2" for="sav-armordf">Armor DF</label>
+            <input id="sav-df" type="number" autocomplete="off" />
+            <input
+              id="sav-armordf"
+              class="col-span-2"
+              type="number"
+              autocomplete="off"
+            />
+          </div>
+          <div class="grid-cols-2 mt-1.5">
+            <label for="sav-weapon">Weapon</label>
+            <label for="sav-armor">Armor</label>
+            <select id="sav-weapon"></select>
+            <select id="sav-armor"></select>
+          </div>
+          <div class="checkbox mt-1.5">
+            <input id="allow-non-equipables" type="checkbox" />
+            <label for="allow-non-equipables">Allow all items</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Inventory</legend>
+          <div class="grid-cols-2">
+            <label for="sav-invslot1">SLOT 1</label>
+            <label for="sav-invslot2">SLOT 2</label>
+            <select id="sav-invslot1"></select>
+            <select id="sav-invslot2"></select>
+            <label for="sav-invslot3">SLOT 3</label>
+            <label for="sav-invslot4">SLOT 4</label>
+            <select id="sav-invslot3"></select>
+            <select id="sav-invslot4"></select>
+            <label for="sav-invslot5">SLOT 5</label>
+            <label for="sav-invslot6">SLOT 6</label>
+            <select id="sav-invslot5"></select>
+            <select id="sav-invslot6"></select>
+            <label for="sav-invslot7">SLOT 7</label>
+            <label for="sav-invslot8">SLOT 8</label>
+            <select id="sav-invslot7"></select>
+            <select id="sav-invslot8"></select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Cellphone</legend>
+          <div class="checkbox">
+            <input id="sav-havecell" type="checkbox" />
+            <label for="sav-havecell">You have a cellphone</label>
+          </div>
+          <div class="grid-cols-2 mt-1.5 hidden" id="cellslots">
+            <label for="sav-cellslot1">SLOT 1</label>
+            <label for="sav-cellslot2">SLOT 2</label>
+            <select id="sav-cellslot1"></select>
+            <select id="sav-cellslot2"></select>
+            <label for="sav-cellslot3">SLOT 3</label>
+            <label for="sav-cellslot4">SLOT 4</label>
+            <select id="sav-cellslot3"></select>
+            <select id="sav-cellslot4"></select>
+            <label for="sav-cellslot5">SLOT 5</label>
+            <label for="sav-cellslot6">SLOT 6</label>
+            <select id="sav-cellslot5"></select>
+            <select id="sav-cellslot6"></select>
+            <label for="sav-cellslot7">SLOT 7</label>
+            <label for="sav-cellslot8">SLOT 8</label>
+            <select id="sav-cellslot7"></select>
+            <select id="sav-cellslot8"></select>
+            <div class="col-span-2 checkbox">
+              <input id="sav-undyne-cell" type="checkbox" />
+              <label for="sav-undyne-cell">Dated Undyne (call with Papyrus)</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="flex">
+          <fieldset>
+            <legend>Ruins</legend>
+            <div class="grid-cols-3">
+              <label for="sav-ruinskills">Kills</label>
+              <label for="sav-trainingdummystate">Dummy</label>
+              <label for="sav-torielstate">Toriel</label>
+              <input
+                id="sav-ruinskills"
+                placeholder="Kills"
+                type="number"
+                autocomplete="off"
+              />
+              <select id="sav-trainingdummystate"></select>
+              <select id="sav-torielstate"></select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Snowdin</legend>
+            <div class="grid-cols-2">
+              <label for="sav-snowdinkills">Kills</label>
+              <label for="sav-doggostate">Doggo</label>
+              <input
+                id="sav-snowdinkills"
+                placeholder="Kills"
+                type="number"
+                autocomplete="off"
+              />
+              <select title="Doggo state" id="sav-doggostate"></select>
+              <label for="sav-dogamydogaressastate">Dogi</label>
+              <label for="sav-greaterdogstate">Greater Dog</label>
+              <select id="sav-dogamydogaressastate"></select>
+              <select id="sav-greaterdogstate"></select>
+              <label for="sav-comedianstate">Comedian</label>
+              <label for="sav-papyrusstate">Papyrus</label>
+              <select title="Comedian state" id="sav-comedianstate"></select>
+              <select title="Papyrus state" id="sav-papyrusstate"></select>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="flex">
+          <fieldset>
+            <legend>Waterfall</legend>
+            <div class="grid-cols-3">
+              <label for="sav-waterfallkills">Kills</label>
+              <label for="sav-shyrenstate">Shyren</label>
+              <label for="sav-maddummystate">Dummy</label>
+              <input
+                id="sav-waterfallkills"
+                placeholder="Kills"
+                type="number"
+                autocomplete="off"
+              />
+              <select id="sav-shyrenstate"></select>
+              <select id="sav-maddummystate"></select>
+            </div>
+            <div class="grid-cols-3 mt-1.5">
+              <label for="sav-undynestate2">Undyne</label>
+              <label class="col-span-2" for="sav-undynestate1">Undyne the Undying</label>
+              <select id="sav-undynestate2"></select>
+              <select id="sav-undynestate1" class="col-span-2"></select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Hotland</legend>
+            <div class="grid-cols-2">
+              <label for="sav-hotlandkills">Kills</label>
+              <label for="sav-broguardsstate">Bro Guards</label>
+              <input
+                id="sav-hotlandkills"
+                placeholder="Kills"
+                type="number"
+                autocomplete="off"
+              />
+              <select title="Bro Guards state" id="sav-broguardsstate"></select>
+              <label for="sav-muffetstate">Muffet</label>
+              <label for="sav-mettatonstate">Mettaton</label>
+              <select title="Muffet state" id="sav-muffetstate"></select>
+              <select title="Mettaton state" id="sav-mettatonstate"></select>
+            </div>
+          </fieldset>
+        </div>
+
+        <fieldset>
+          <legend>Other</legend>
+          <div class="checkbox">
+            <input
+              id="sav-exitedtruelab"
+              type="checkbox"
+              name="exitedtruelab"
+            />
+            <label
+              title="True lab exited (can get true ending)"
+              for="sav-exitedtruelab"
+              >True lab exited</label
+            >
+          </div>
+          <div class="checkbox" style="margin-bottom: 0.5rem">
+            <input id="sav-defeatedasriel" type="checkbox" />
+            <label
+              title="Defeated Asriel (true pacifist finished)"
+              for="sav-defeatedasriel"
+              >Defeated Asriel</label
+            >
+          </div>
+          <label for="sav-plotvalue">Plot value</label>
+          <select
+            title="Plot value"
+            id="sav-plotvalue"
+            class="w-full mt-1.5"
+          ></select>
+        </fieldset>
+
+        <fieldset class="col-span-2">
+          <legend>FUN Values</legend>
+          <div class="grid-cols-2">
+            <table>
+              <tr>
+                <td>Value</th>
+                <td>Effect</th>
+              </tr>
+              <tr>
+                <td>2-39</td>
+                <td>Wrong number</td>
+              </tr>
+              <tr>
+                <td>40-45</td>
+                <td>Sans' call</td>
+              </tr>
+              <tr>
+                <td>46-50</td>
+                <td>Alphys' call</td>
+              </tr>
+              <tr>
+                <td>56-57</td>
+                <td>Nightmare mode</td>
+              </tr>
+            </table>
+            <table>
+              <tr>
+                <td>61-63</td>
+                <td>Gaster followers</td>
+              </tr>
+              <tr>
+                <td>65</td>
+                <td>Sound test room</td>
+              </tr>
+              <tr>
+                <td>66</td>
+                <td>Fake hallway</td>
+              </tr>
+              <tr>
+                <td>80-89</td>
+                <td>Clam girl</td>
+              </tr>
+              <tr>
+                <td>90-100</td>
+                <td>Goner kid</td>
+              </tr>
+            </table>
+          </div>
+        </fieldset>
+        <fieldset class="col-span-3">
+          <legend>Advanced</legend>
+          <fieldset class="grid-cols-3" style="top: 3px; position: sticky;">
+            <div class="col-span-2">
+              <p>PLEASE only proceed if you know what you are doing!</p>
+              <p>Each flag has a mouseover explanation.</p>
+              <p><a href="help.html#Advanced_Mode">More info</a></p>
+            </div>
+            <button id="hide-advanced">Show</button>
+          </fieldset>
+          <div class="grid-cols-3 mt-1.5 hidden" id="advanced"></div>
+        </fieldset>
+      </section>
+    </div>
+  </body>
+</html>
