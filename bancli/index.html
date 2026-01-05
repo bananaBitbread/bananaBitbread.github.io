@@ -1,95 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Game Launcher</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-
-    #launcher {
-      padding: 12px;
-      background: #1b1b1b;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    select, button {
-      padding: 8px;
-      font-size: 16px;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    #gameFrame {
-      width: 100vw;
-      height: calc(100vh - 56px);
-      overflow: hidden;
-    }
-  </style>
+ <meta charset="UTF-8">
+ <title>Game Launcher</title>
 </head>
 <body>
 
-  <div id="launcher">
-    <label for="gameSelect">Select Game:</label>
-    <select id="gameSelect">
-      <option value="">-- Choose --</option>
 
-      <optgroup label="Deltarune">
-        <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter1/index.html">Chapter 1</option>
-        <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter2/index.html">Chapter 2</option>
-        <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter3/index.html">Chapter 3</option>
-        <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter4/index.html">Chapter 4</option>
-        <option value="https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/b3506981a7f2128d7f1737fcac4dd3f10eb0f0c235c4af3962691ef7f4352dadf7a8c2ec42190d3cf4b6917ee0deea11f671@main/rush/index.html">Boss Rush</option>
-      </optgroup>
-      <optgroup label="Undertale">
-        <option value="https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/9326265e4f1b14345a3bdab6f8ffad0e2e7ab3fda920c5f0f095f77359af00aeae22591c5bc4914c84c13d99eb62091d7ce7@main/utweb/play/index.html">Undertale</option>
-        <option value="https://cdn.jsdelivr.net/gh/genizy/web-port@main/undertale-yellow/index.html">Undertale Yellow</option>
-      </optgroup>
-    </select>
+<h1 style="
+ font-size: 52px;
+ font-family: 'Trebuchet MS', 'Impact', 'Arial Black', sans-serif;
+ text-align: center;
+ margin: 20px 0;
+ letter-spacing: 2px;
+">
+Game Launcher
+</h1>
 
-    <button onclick="launchGame()">Play</button>
-  </div>
 
-  <div id="gameFrame"></div>
+<div style="text-align:center;">
+ <select id="gameSelect" onchange="lockDefaultOption()">
+   <option value="" id="defaultOption">-- Choose --</option>
 
-  <script>
-    async function launchGame() {
-      const select = document.getElementById("gameSelect");
-      const container = document.getElementById("gameFrame");
 
-      if (!select.value) {
-        alert("Select a game first.");
-        return;
-      }
+   <optgroup label="Deltarune">
+     <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter1/index.html">Deltarune – Chapter 1</option>
+     <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter2/index.html">Deltarune – Chapter 2</option>
+     <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter3/index.html">Deltarune – Chapter 3</option>
+     <option value="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/chapter4/index.html">Deltarune – Chapter 4</option>
+     <option value="https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/b3506981a7f2128d7f1737fcac4dd3f10eb0f0c235c4af3962691ef7f4352dadf7a8c2ec42190d3cf4b6917ee0deea11f671@main/rush/index.html">Boss Rush</option>   
+   </optgroup>
 
-      try {
-        const response = await fetch(select.value);
-        if (!response.ok) throw new Error("Fetch failed");
 
-        const html = await response.text();
+   <optgroup label="Undertale">
+     <option value="https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/9326265e4f1b14345a3bdab6f8ffad0e2e7ab3fda920c5f0f095f77359af00aeae22591c5bc4914c84c13d99eb62091d7ce7@main/utweb/play/index.html">
+       Undertale
+     </option>
+     <option value="https://cdn.jsdelivr.net/gh/genizy/web-port@main/undertale-yellow/index.html">
+       Undertale Yellow
+     </option>
+   </optgroup>
 
-        // Replace page content
-        container.innerHTML = html;
 
-      } catch (err) {
-        container.innerHTML = `
-          <div style="padding:20px;color:red">
-            Failed to load game.<br>
-            ${err.message}
-          </div>`;
-        console.error(err);
-      }
-    }
-  </script>
+   <optgroup label="Other">
+     <option value="https://cdn.jsdelivr.net/gh/bananabitbread/bananabitbread.github.io@main/rl2d/index.html">
+       Rocket League 2D
+     </option>
+     <option value="https://cdn.jsdelivr.net/gh/aukak/hollow-knight@latest/index.html">
+       Hollow Knight
+     </option>
+   </optgroup>
+ </select>
+
+
+ <button onclick="launchGame()">Play</button>
+</div>
+
+
+<script>
+function lockDefaultOption() {
+ const select = document.getElementById("gameSelect");
+ const defaultOption = document.getElementById("defaultOption");
+
+
+ if (select.value !== "") {
+   defaultOption.disabled = true;
+ }
+}
+
+
+async function launchGame() {
+ const url = document.getElementById("gameSelect").value;
+ if (!url) return;
+
+
+ const response = await fetch(url);
+ const html = await response.text();
+
+
+ document.open();
+ document.write(html);
+ document.close();
+}
+</script>
+
 
 </body>
 </html>
+
+
+
+
+
