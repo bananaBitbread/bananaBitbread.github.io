@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <!-- Primary SEO tags -->
+    <base href="https://nosleep.page">
+    <link rel="canonical" href="https://nosleep.page/">
+    <meta name="keywords"
+          content="screen awake, prevent device sleep, nosleep.js, keep screen on, screen sleep prevention">
+    <meta name="description"
+          content="Prevent your device from sleeping with nosleep.page. Track your awake time and view statistics directly in your browser.">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="nosleep.page – Keep Your Screen Awake">
+    <meta property="og:description"
+          content="Prevent your device from sleeping with nosleep.page. Track your awake time and view statistics directly in your browser.">
+    <meta property="og:url" content="https://nosleep.page/">
+    <meta property="og:type" content="website">
+    <!-- (optionally add an og:image here) -->
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="nosleep.page – Keep Your Screen Awake">
+    <meta name="twitter:description"
+          content="Prevent your device from sleeping with nosleep.page. Track your awake time and view statistics directly in your browser.">
+
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "nosleep.page",
+            "url": "https://nosleep.page/",
+            "description": "Prevent your device from sleeping and track screen-awake time in real time.",
+            "publisher": {
+                "@type": "Organization",
+                "name": "nosleep.page"
+            }
+        }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Keep your screen awake with nosleep.page">
+    <title>nosleep.page – Keep Your Screen Awake</title>
+    <link id="favicon" rel="icon"
+          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕️</text></svg>">
+    <!-- nosleep.js to prevent device sleep -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
+    <!-- Tailwind CSS -->
+    <link href="./styles.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+<main class="flex flex-col items-center justify-center min-h-screen p-4 transition-colors">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 max-w-md w-full space-y-6 text-center">
+        <!-- Central Progress Ring Control -->
+        <button id="wake-toggle" aria-label="Toggle screen-awake session"
+                class="relative w-48 h-48 rounded-full border-8 border-gray-300 dark:border-gray-700 flex items-center justify-center mx-auto focus:outline-none">
+            <svg
+                    id="progress-ring"
+                    class="absolute transform -rotate-90 transition-all duration-500 ease-out text-teal-500"
+                    style="transform-origin:96px 96px;"
+                    width="192" height="192"
+            >
+                <circle
+                        cx="96" cy="96" r="88"
+                        fill="transparent"
+                        stroke="currentColor"
+                        stroke-width="16"
+                        stroke-dasharray="552"
+                        stroke-dashoffset="552"
+                        stroke-linecap="round"
+                />
+            </svg>
+            <span id="toggle-icon" class="text-4xl text-gray-700 dark:text-gray-200 z-0">▶️</span>
+            <span id="timer-text" class="absolute text-xl text-gray-800 dark:text-gray-100 hidden z-10">00:00</span>
+        </button>
+
+        <!-- Quick Duration & Custom Controls -->
+        <div id="quick-controls" class="mt-6 flex items-center justify-center space-x-3">
+            <button class="duration-chip px-4 py-2 rounded-full border border-teal-500 text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900 transition-colors duration-200">
+                30 min
+            </button>
+            <button class="hidden sm:block duration-chip px-4 py-2 rounded-full border border-teal-500 text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900 transition-colors duration-200">
+                1 hr
+            </button>
+            <button class="duration-chip px-4 py-2 rounded-full border border-teal-500 text-teal-500 hover:bg-teal-50 dark:hover:bg-teal-900 transition-colors duration-200">
+                2 hr
+            </button>
+            <button id="custom-btn"
+                    class="px-4 py-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-colors duration-200">
+                Custom
+            </button>
+            <!-- moved here, hidden by default -->
+            <form id="custom-form" class="hidden flex space-x-2 items-center">
+                <input type="time" required value="00:00" id="custom-input" step="60" class="w-24 p-2 border rounded">
+                <button type="submit" id="custom-start" class="px-4 py-2 bg-teal-500 text-white rounded">Start</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div id="stats" class="mt-6 text-gray-700 dark:text-gray-300">
+        Today: <span id="today-min">0</span> min | This Week: <span id="week-hr">0</span> hr <span
+                id="week-min">0</span> min
+    </div>
+</main>
+
+<section class="relative max-w-3xl w-full mx-auto pb-8 mt-8 [@media(min-height:650px)]:-mt-28 px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 space-y-4">
+        <div class="space-y-4 divide-y divide-gray-200 dark:divide-gray-700 text-left">
+            <details open
+                     class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <summary class="font-semibold cursor-pointer mb-2">How do I use nosleep.page?</summary>
+                <p class="text-gray-700 dark:text-gray-200">Click the central ring to start or stop keeping your
+                    screen awake.</p>
+                <p class="text-gray-700 dark:text-gray-200">You can pick a preset duration or enter a custom time to
+                    prevent sleep for.</p>
+            </details>
+            <details
+                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <summary class="font-semibold cursor-pointer mb-2">Why doesn’t my screen stay awake?</summary>
+                <p class="text-gray-700 dark:text-gray-200">Ensure this tab stays in the foreground (desktop) or
+                    unlocked (mobile) and that you grant the wake-lock permission.</p>
+            </details>
+            <details
+                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <summary class="font-semibold cursor-pointer mb-2">How do I reset my stats?</summary>
+                <a href="#" id="reset-stats" class="text-teal-500 hover:text-teal-600">Click here to reset your
+                    stats</a>
+            </details>
+            <details
+                    class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                <summary class="font-semibold cursor-pointer mb-2">Can I customise the color?</summary>
+                <div class="space-y-4 text-sm">
+                    <div class="flex items-center justify-between">
+                        <label for="theme-color-picker" class="text-gray-700 dark:text-gray-200">Theme color</label>
+                        <input id="theme-color-picker" type="color" class="w-10 h-8 rounded border">
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <label for="background-color-picker" class="text-gray-700 dark:text-gray-200">Background color</label>
+                        <input id="background-color-picker" type="color" class="w-10 h-8 rounded border">
+                    </div>
+                    <div class="text-right">
+                        <button id="reset-colors" class="text-teal-500 hover:text-teal-600">Reset to default</button>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- Main script -->
+<script src="./app.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"60dc750c026643a185305454d55f4d4c","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
