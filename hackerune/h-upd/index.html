@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deltarune - Chapter Select</title>
+    <base href="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            font-family: 'Courier New', 'monospace', monospace;
+        }
+                :root {
+            --deep-blue: #0066cc;
+            --dark-blue: #003366;
+            --neon-blue: #3399ff;
+            --bright-blue: #4d94ff;
+            --pixel-blue: #5599ff;
+            --dark-bg: #0a0a0a;
+            --panel-bg: #111111;
+            --border-blue: #003366;
+            --text-glow: 0 0 8px var(--neon-blue);
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.03"><rect width="100" height="100" fill="none" stroke="%233399ff" stroke-width="1"/></svg>');
+            position: relative;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="%233399ff"/><rect x="7" y="0" width="2" height="16" fill="%23000"/><rect x="0" y="7" width="16" height="2" fill="%23000"/></svg>') 8 8, auto;
+            padding-top: 20px;
+        }
+        
+        /* Pixel grid overlay */
+        .pixel-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(51, 153, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 153, 255, 0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* CRT scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.2) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0.3;
+            animation: scanline 10s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* Logo at the very top */
+        .logo-top {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            max-width: 500px;
+            width: 90%;
+            border: 4px solid var(--deep-blue);
+            image-rendering: pixelated;
+        }
+        
+        /* Main menu with pixel aesthetic */
+        .menu-container {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 10;
+            border: 2px solid var(--border-blue);
+            background-color: rgba(0, 0, 0, 0.85);
+            box-shadow: 
+                0 0 40px rgba(0, 102, 204, 0.5),
+                inset 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+        
+        .menu-title {
+            text-align: center;
+            font-size: 36px;
+            color: var(--neon-blue);
+            margin-bottom: 30px;
+            text-shadow: var(--text-glow);
+            letter-spacing: 2px;
+            font-weight: bold;
+            border-bottom: 2px solid var(--border-blue);
+            padding-bottom: 10px;
+        }
+        
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        
+        /* Chapter rows - pixel perfect */
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 25px;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 32, 64, 0.9) 0%,
+                rgba(0, 16, 32, 0.9) 100%
+            );
+            border: 2px solid var(--border-blue);
+            text-decoration: none;
+            color: white;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            font-size: 14px;
+        }
+        
+        .row:hover {
+            background: linear-gradient(
+                135deg,
+                rgba(0, 64, 96, 0.9) 0%,
+                rgba(0, 32, 64, 0.9) 100%
+            );
+            border-color: var(--neon-blue);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.7),
+                0 0 20px rgba(51, 153, 255, 0.4);
+            animation: pixelHover 0.3s;
+        }
+        
+        @keyframes pixelHover {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(-2px); }
+        }
+        
+        .row:active {
+            transform: translateY(0);
+            transition: transform 0.05s;
+            border-color: var(--bright-blue);
+        }
+        
+        /* Selected state with pixel animation */
+        .row.selected {
+            border-color: var(--neon-blue);
+            background: linear-gradient(
+                135deg,
+                rgba(0, 64, 128, 0.9) 0%,
+                rgba(0, 32, 96, 0.9) 100%
+            );
+            animation: selectedPixel 1s infinite;
+            box-shadow: 
+                0 0 20px rgba(51, 153, 255, 0.6),
+                inset 0 0 20px rgba(51, 153, 255, 0.2);
+        }
+        
+        @keyframes selectedPixel {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 15px rgba(51, 153, 255, 0.6),
+                    inset 0 0 15px rgba(51, 153, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 25px rgba(51, 153, 255, 0.8),
+                    inset 0 0 25px rgba(51, 153, 255, 0.3);
+            }
+        }
+        
+        /* Chapter info - pixel font */
+        .chapter-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .chapter {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--pixel-blue);
+            margin-bottom: 5px;
+            text-shadow: var(--text-glow);
+            text-transform: uppercase;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 1px;
+        }
+        
+        /* Chapter icons with pixel border */
+        .row img {
+            width: 64px;
+            height: 64px;
+            border: 2px solid var(--border-blue);
+            image-rendering: pixelated;
+            margin-left: 20px;
+            transition: all 0.2s;
+            box-shadow: 2px 2px 0 #000;
+        }
+        
+        .row:hover img {
+            border-color: var(--neon-blue);
+            transform: scale(1.05);
+            box-shadow: 
+                3px 3px 0 #000,
+                0 0 10px rgba(51, 153, 255, 0.5);
+        }
+        
+        /* Mute button - pixel style */
+        #mute {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--border-blue);
+            background: #111;
+            color: var(--neon-blue);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            box-shadow: 3px 3px 0 #000;
+            transition: all 0.2s;
+            image-rendering: pixelated;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #mute:hover {
+            background: #222;
+            border-color: var(--neon-blue);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 #000;
+        }
+        
+        #mute:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 #000;
+        }
+        
+        /* Footer - pixel info */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #333;
+            letter-spacing: 1px;
+            background: rgba(0, 0, 0, 0.7);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .footer .controls {
+            color: var(--pixel-blue);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        /* Debug panel like your game engine */
+        .debug {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px;
+            font-size: 12px;
+            border: 2px solid var(--border-blue);
+            color: var(--pixel-blue);
+            font-family: 'Courier New', monospace;
+            display: none;
+            z-index: 1000;
+            box-shadow: 2px 2px 0 #000;
+        }
+        
+        .debug.active {
+            display: block;
+        }
+        
+        /* Pixel particles */
+        .pixel-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .pixel-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: var(--neon-blue);
+            animation: floatParticle 15s infinite linear;
+        }
+        
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+        
+        /* Additional blue effects */
+        .row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(51, 153, 255, 0.1),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+        
+        .row:hover::before {
+            left: 100%;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo {
+                max-width: 400px;
+            }
+            
+            .menu-title {
+                font-size: 28px;
+            }
+            
+            .title {
+                font-size: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                max-width: 300px;
+            }
+            
+            .row {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 16px;
+            }
+            
+            .chapter {
+                font-size: 10px;
+            }
+            
+            .row img {
+                width: 48px;
+                height: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CRT and pixel effects -->
+    <div class="pixel-grid"></div>
+    <div class="scanlines"></div>
+    <div class="pixel-particles" id="pixelParticles"></div>
+    
+    <!-- Logo at the very top -->
+    <div class="logo-top">
+        <img src="logo.png" alt="DELTARUNE" class="logo">
+    </div>
+    
+    <!-- Main menu -->
+    <div class="menu-container">
+        <div class="menu-title">CHAPTER SELECT</div>
+        
+        <div class="menu">
+            <a href="javascript:loadChapter(1)" class="row">
+                <div class="chapter-info">
+                    <span class="chapter">CHAPTER 01</span>
+                    <span class="title">THE BEGINNING</span>
+                </div>
+                <img src="icons/1.png" alt="Chapter 1">
+            </a>
+            
+            <a href="javascript:loadChapter(2)" class="row">
+                <div class="chapter-info">
+                    <span class="chapter">CHAPTER 02</span>
+                    <span class="title">A CYBER'S WORLD</span>
+                </div>
+                <img src="icons/2.png" alt="Chapter 2">
+            </a>
+            
+            <a href="javascript:loadChapter(3)" class="row">
+                <div class="chapter-info">
+                    <span class="chapter">CHAPTER 03</span>
+                    <span class="title">LATE NIGHT</span>
+                </div>
+                <img src="icons/3.png" alt="Chapter 3">
+            </a>
+            
+            <a href="javascript:loadChapter(4)" class="row">
+                <div class="chapter-info">
+                    <span class="chapter">CHAPTER 04</span>
+                    <span class="title">PROPHECY</span>
+                </div>
+                <img src="icons/4.png" alt="Chapter 4">
+            </a>
+        </div>
+    </div>
+    
+    <!-- Debug panel -->
+    <div class="debug" id="debug">
+        <div>CHAPTER SELECT MODE</div>
+        <div>SELECTED: <span id="debugChapter">NONE</span></div>
+        <div>FPS: <span id="debugFPS">60</span></div>
+    </div>
+    
+    <!-- Mute button -->
+    <button id="mute" title="Toggle Sound">🔊</button>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <div class="controls">[↑↓] NAVIGATE • [ENTER] SELECT • [ESC] MENU</div>
+        <div>DELTARUNE Chapter Selection • Use Arrow Keys or Mouse</div>
+    </div>
+    
+    <script>
+        // Create pixel particles
+        function createPixelParticles() {
+            const container = document.getElementById('pixelParticles');
+            const count = 30;
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('pixel-particle');
+                
+                // Random properties
+                const left = Math.random() * 100;
+                const duration = Math.random() * 15 + 10;
+                const delay = Math.random() * 5;
+                const size = Math.random() * 2 + 1;
+                
+                particle.style.left = `${left}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random blue color
+                const blues = ['#0066cc', '#3399ff', '#5599ff', '#4d94ff', '#0066ff'];
+                particle.style.backgroundColor = blues[Math.floor(Math.random() * blues.length)];
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // Audio system
+        const menumoveaudio = new Audio('audios/snd_menumove.mp3');
+        const menuselectaudio = new Audio('audios/snd_select.mp3');
+        const muteButton = document.getElementById('mute');
+        const debugPanel = document.getElementById('debug');
+        const debugChapter = document.getElementById('debugChapter');
+        const debugFPS = document.getElementById('debugFPS');
+        
+        let gamestarted = false;
+        let selectedChapter = null;
+        let isMuted = false;
+        let lastTime = 0;
+        let fps = 60;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createPixelParticles();
+            updateMuteButton();
+            
+            // Start FPS counter
+            requestAnimationFrame(updateFPS);
+            
+            // Show debug panel
+            setTimeout(() => {
+                debugPanel.classList.add('active');
+            }, 1000);
+        });
+        
+        // FPS counter
+        function updateFPS(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+            lastTime = timestamp;
+            
+            fps = Math.round(1000 / delta);
+            debugFPS.textContent = fps;
+            
+            requestAnimationFrame(updateFPS);
+        }
+        
+        // Mute button functionality
+        muteButton.addEventListener('click', () => {
+            if (!gamestarted) {
+                isMuted = !isMuted;
+                menumoveaudio.muted = isMuted;
+                menuselectaudio.muted = isMuted;
+                updateMuteButton();
+                
+                // Play sound effect
+                if (!isMuted) {
+                    const audio = new Audio('audios/snd_menumove.mp3');
+                    audio.volume = 0.3;
+                    audio.play();
+                }
+            }
+        });
+        
+        function updateMuteButton() {
+            muteButton.textContent = isMuted ? '🔇' : '🔊';
+            muteButton.style.color = isMuted ? '#666' : '#3399ff';
+            muteButton.style.borderColor = isMuted ? '#444' : '#3399ff';
+        }
+        
+        // Load chapter function
+        function loadChapter(chapter) {
+            if (gamestarted) return;
+            
+            // Update debug
+            debugChapter.textContent = `CHAPTER ${chapter}`;
+            
+            // Play selection sound
+            if (!isMuted) {
+                menuselectaudio.currentTime = 0;
+                menuselectaudio.play();
+            }
+            
+            // Direct chapter loading without fake animation
+            gamestarted = true;
+            
+            // Fetch and load the chapter
+            fetch(`https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/9326265e4f1b14345a3bdab6f8ffad0e2e7ab3fda920c5f0f095f77359af00aeae22591c5bc4914c84c13d99eb62091d7ce7/drweb/chapter${chapter}/index.html`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Chapter not found');
+                    return res.text();
+                })
+                .then(html => {
+                    document.documentElement.innerHTML = html;
+                    document.documentElement.querySelectorAll('script').forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        if (oldScript.src) {
+                            newScript.src = oldScript.src;
+                        } else {
+                            newScript.textContent = oldScript.textContent;
+                        }
+                        document.body.appendChild(newScript);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading chapter:', error);
+                    alert('Error: Chapter not found or could not be loaded.');
+                    gamestarted = false;
+                });
+        }
+        
+        // Hover effects
+        document.querySelectorAll('.row').forEach((row, index) => {
+            row.addEventListener('mouseenter', () => {
+                if (!gamestarted && !isMuted) {
+                    menumoveaudio.currentTime = 0;
+                    menumoveaudio.play();
+                }
+            });
+            
+            row.addEventListener('click', (e) => {
+                if (!gamestarted) {
+                    e.preventDefault();
+                    loadChapter(index + 1);
+                }
+            });
+        });
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (!gamestarted) {
+                const rows = document.querySelectorAll('.row');
+                
+                if (event.key === 'ArrowUp' || event.key === 'w') {
+                    event.preventDefault();
+                    if (selectedChapter === null) {
+                        selectedChapter = 0;
+                        rows[0].classList.add("selected");
+                        playMoveSound();
+                    } else {
+                        rows[selectedChapter].classList.remove("selected");
+                        selectedChapter--;
+                        if (selectedChapter < 0) {
+                            selectedChapter = rows.length - 1;
+                        }
+                        rows[selectedChapter].classList.add("selected");
+                        playMoveSound();
+                    }
+                    
+                    updateDebug();
+                    scrollToSelected();
+                } 
+                
+                if (event.key === 'ArrowDown' || event.key === 's') {
+                    event.preventDefault();
+                    if (selectedChapter === null) {
+                        selectedChapter = 0;
+                        rows[0].classList.add("selected");
+                        playMoveSound();
+                    } else {
+                        rows[selectedChapter].classList.remove("selected");
+                        selectedChapter = (selectedChapter + 1) % rows.length;
+                        rows[selectedChapter].classList.add("selected");
+                        playMoveSound();
+                    }
+                    
+                    updateDebug();
+                    scrollToSelected();
+                }
+                
+                if (event.key === 'Enter') {
+                    if (selectedChapter !== null) {
+                        event.preventDefault();
+                        loadChapter(selectedChapter + 1);
+                    }
+                }
+                
+                if (event.key === 'Escape') {
+                    // Show/hide debug panel
+                    debugPanel.classList.toggle('active');
+                }
+            }
+        });
+        
+        function playMoveSound() {
+            if (!isMuted) {
+                menumoveaudio.currentTime = 0;
+                menumoveaudio.play();
+            }
+        }
+        
+        function updateDebug() {
+            if (selectedChapter !== null) {
+                debugChapter.textContent = `CHAPTER ${selectedChapter + 1}`;
+            }
+        }
+        
+        function scrollToSelected() {
+            if (selectedChapter !== null) {
+                const rows = document.querySelectorAll('.row');
+                rows[selectedChapter].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+        
+        // Initial selection
+        setTimeout(() => {
+            if (selectedChapter === null) {
+                const rows = document.querySelectorAll('.row');
+                if (rows.length > 0) {
+                    selectedChapter = 0;
+                    rows[0].classList.add("selected");
+                    updateDebug();
+                }
+            }
+        }, 500);
+        
+        // Add click sound to all interactive elements
+        document.querySelectorAll('a, button').forEach(element => {
+            element.addEventListener('click', () => {
+                if (!gamestarted && !isMuted) {
+                    const clickSound = new Audio('audios/snd_select.mp3');
+                    clickSound.volume = 0.5;
+                    clickSound.play();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
