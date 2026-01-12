@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DELTARUNE - Chapter Select</title>
+    <title>Deltarune - Chapter Select</title>
     <base href="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
@@ -14,17 +14,16 @@
             image-rendering: pixelated;
             font-family: 'Courier New', 'monospace', monospace;
         }
-        
-        :root {
-            --blood-red: #c00000;
-            --dark-red: #8b0000;
-            --neon-red: #ff3333;
-            --warm-red: #ff4d4d;
-            --pixel-red: #ff5555;
+                :root {
+            --deep-blue: #0066cc;
+            --dark-blue: #003366;
+            --neon-blue: #3399ff;
+            --bright-blue: #4d94ff;
+            --pixel-blue: #5599ff;
             --dark-bg: #0a0a0a;
             --panel-bg: #111111;
-            --border-red: #660000;
-            --text-glow: 0 0 8px var(--neon-red);
+            --border-blue: #003366;
+            --text-glow: 0 0 8px var(--neon-blue);
         }
         
         body {
@@ -33,9 +32,9 @@
             min-height: 100vh;
             overflow-x: hidden;
             background-image: 
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.03"><rect width="100" height="100" fill="none" stroke="%23ff3333" stroke-width="1"/></svg>');
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.03"><rect width="100" height="100" fill="none" stroke="%233399ff" stroke-width="1"/></svg>');
             position: relative;
-            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="%23ff3333"/><rect x="7" y="0" width="2" height="16" fill="%23000"/><rect x="0" y="7" width="16" height="2" fill="%23000"/></svg>') 8 8, auto;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="%233399ff"/><rect x="7" y="0" width="2" height="16" fill="%23000"/><rect x="0" y="7" width="16" height="2" fill="%23000"/></svg>') 8 8, auto;
             padding-top: 20px;
         }
         
@@ -47,8 +46,8 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(255, 51, 51, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 51, 51, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(51, 153, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(51, 153, 255, 0.03) 1px, transparent 1px);
             background-size: 32px 32px;
             z-index: -1;
             pointer-events: none;
@@ -90,7 +89,7 @@
         .logo {
             max-width: 500px;
             width: 90%;
-            border: 4px solid var(--blood-red);
+            border: 4px solid var(--deep-blue);
             image-rendering: pixelated;
         }
         
@@ -101,22 +100,22 @@
             padding: 30px 20px;
             position: relative;
             z-index: 10;
-            border: 2px solid var(--border-red);
+            border: 2px solid var(--border-blue);
             background-color: rgba(0, 0, 0, 0.85);
             box-shadow: 
-                0 0 40px rgba(192, 0, 0, 0.5),
+                0 0 40px rgba(0, 102, 204, 0.5),
                 inset 0 0 40px rgba(0, 0, 0, 0.8);
         }
         
         .menu-title {
             text-align: center;
             font-size: 36px;
-            color: var(--neon-red);
+            color: var(--neon-blue);
             margin-bottom: 30px;
             text-shadow: var(--text-glow);
             letter-spacing: 2px;
             font-weight: bold;
-            border-bottom: 2px solid var(--border-red);
+            border-bottom: 2px solid var(--border-blue);
             padding-bottom: 10px;
         }
         
@@ -134,10 +133,10 @@
             padding: 20px 25px;
             background: linear-gradient(
                 135deg,
-                rgba(64, 0, 0, 0.9) 0%,
-                rgba(32, 0, 0, 0.9) 100%
+                rgba(0, 32, 64, 0.9) 0%,
+                rgba(0, 16, 32, 0.9) 100%
             );
-            border: 2px solid var(--border-red);
+            border: 2px solid var(--border-blue);
             text-decoration: none;
             color: white;
             transition: all 0.2s;
@@ -150,14 +149,14 @@
         .row:hover {
             background: linear-gradient(
                 135deg,
-                rgba(96, 0, 0, 0.9) 0%,
-                rgba(64, 0, 0, 0.9) 100%
+                rgba(0, 64, 96, 0.9) 0%,
+                rgba(0, 32, 64, 0.9) 100%
             );
-            border-color: var(--neon-red);
+            border-color: var(--neon-blue);
             transform: translateY(-2px);
             box-shadow: 
                 0 6px 12px rgba(0, 0, 0, 0.7),
-                0 0 20px rgba(255, 51, 51, 0.4);
+                0 0 20px rgba(51, 153, 255, 0.4);
             animation: pixelHover 0.3s;
         }
         
@@ -170,33 +169,33 @@
         .row:active {
             transform: translateY(0);
             transition: transform 0.05s;
-            border-color: var(--warm-red);
+            border-color: var(--bright-blue);
         }
         
         /* Selected state with pixel animation */
         .row.selected {
-            border-color: var(--neon-red);
+            border-color: var(--neon-blue);
             background: linear-gradient(
                 135deg,
-                rgba(128, 0, 0, 0.9) 0%,
-                rgba(96, 0, 0, 0.9) 100%
+                rgba(0, 64, 128, 0.9) 0%,
+                rgba(0, 32, 96, 0.9) 100%
             );
             animation: selectedPixel 1s infinite;
             box-shadow: 
-                0 0 20px rgba(255, 51, 51, 0.6),
-                inset 0 0 20px rgba(255, 51, 51, 0.2);
+                0 0 20px rgba(51, 153, 255, 0.6),
+                inset 0 0 20px rgba(51, 153, 255, 0.2);
         }
         
         @keyframes selectedPixel {
             0%, 100% { 
                 box-shadow: 
-                    0 0 15px rgba(255, 51, 51, 0.6),
-                    inset 0 0 15px rgba(255, 51, 51, 0.2);
+                    0 0 15px rgba(51, 153, 255, 0.6),
+                    inset 0 0 15px rgba(51, 153, 255, 0.2);
             }
             50% { 
                 box-shadow: 
-                    0 0 25px rgba(255, 51, 51, 0.8),
-                    inset 0 0 25px rgba(255, 51, 51, 0.3);
+                    0 0 25px rgba(51, 153, 255, 0.8),
+                    inset 0 0 25px rgba(51, 153, 255, 0.3);
             }
         }
         
@@ -211,7 +210,7 @@
             font-size: 12px;
             font-weight: bold;
             letter-spacing: 3px;
-            color: var(--pixel-red);
+            color: var(--pixel-blue);
             margin-bottom: 5px;
             text-shadow: var(--text-glow);
             text-transform: uppercase;
@@ -229,7 +228,7 @@
         .row img {
             width: 64px;
             height: 64px;
-            border: 2px solid var(--border-red);
+            border: 2px solid var(--border-blue);
             image-rendering: pixelated;
             margin-left: 20px;
             transition: all 0.2s;
@@ -237,11 +236,11 @@
         }
         
         .row:hover img {
-            border-color: var(--neon-red);
+            border-color: var(--neon-blue);
             transform: scale(1.05);
             box-shadow: 
                 3px 3px 0 #000,
-                0 0 10px rgba(255, 51, 51, 0.5);
+                0 0 10px rgba(51, 153, 255, 0.5);
         }
         
         /* Mute button - pixel style */
@@ -251,9 +250,9 @@
             right: 20px;
             width: 48px;
             height: 48px;
-            border: 2px solid var(--border-red);
+            border: 2px solid var(--border-blue);
             background: #111;
-            color: var(--neon-red);
+            color: var(--neon-blue);
             font-size: 20px;
             cursor: pointer;
             display: flex;
@@ -268,7 +267,7 @@
         
         #mute:hover {
             background: #222;
-            border-color: var(--neon-red);
+            border-color: var(--neon-blue);
             transform: translate(-1px, -1px);
             box-shadow: 4px 4px 0 #000;
         }
@@ -294,7 +293,7 @@
         }
         
         .footer .controls {
-            color: var(--pixel-red);
+            color: var(--pixel-blue);
             font-weight: bold;
             margin-bottom: 10px;
         }
@@ -307,8 +306,8 @@
             background: rgba(0, 0, 0, 0.85);
             padding: 10px;
             font-size: 12px;
-            border: 2px solid var(--border-red);
-            color: var(--pixel-red);
+            border: 2px solid var(--border-blue);
+            color: var(--pixel-blue);
             font-family: 'Courier New', monospace;
             display: none;
             z-index: 1000;
@@ -335,7 +334,7 @@
             position: absolute;
             width: 2px;
             height: 2px;
-            background-color: var(--neon-red);
+            background-color: var(--neon-blue);
             animation: floatParticle 15s infinite linear;
         }
         
@@ -344,6 +343,27 @@
             10% { opacity: 0.5; }
             90% { opacity: 0.5; }
             100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+        
+        /* Additional blue effects */
+        .row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(51, 153, 255, 0.1),
+                transparent
+            );
+            transition: left 0.5s;
+        }
+        
+        .row:hover::before {
+            left: 100%;
         }
         
         /* Responsive design */
@@ -477,9 +497,9 @@
                 particle.style.width = `${size}px`;
                 particle.style.height = `${size}px`;
                 
-                // Random red color
-                const reds = ['#c00000', '#ff3333', '#ff5555', '#ff4d4d'];
-                particle.style.backgroundColor = reds[Math.floor(Math.random() * reds.length)];
+                // Random blue color
+                const blues = ['#0066cc', '#3399ff', '#5599ff', '#4d94ff', '#0066ff'];
+                particle.style.backgroundColor = blues[Math.floor(Math.random() * blues.length)];
                 
                 container.appendChild(particle);
             }
@@ -544,8 +564,8 @@
         
         function updateMuteButton() {
             muteButton.textContent = isMuted ? '🔇' : '🔊';
-            muteButton.style.color = isMuted ? '#666' : '#ff3333';
-            muteButton.style.borderColor = isMuted ? '#444' : '#ff3333';
+            muteButton.style.color = isMuted ? '#666' : '#3399ff';
+            muteButton.style.borderColor = isMuted ? '#444' : '#3399ff';
         }
         
         // Load chapter function
@@ -565,7 +585,7 @@
             gamestarted = true;
             
             // Fetch and load the chapter
-            fetch(`chapter${chapter}/index.html`)
+            fetch(`https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/9326265e4f1b14345a3bdab6f8ffad0e2e7ab3fda920c5f0f095f77359af00aeae22591c5bc4914c84c13d99eb62091d7ce7/drweb/chapter${chapter}/index.html`)
                 .then(res => {
                     if (!res.ok) throw new Error('Chapter not found');
                     return res.text();
