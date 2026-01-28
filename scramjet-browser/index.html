@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>URL Embed Viewer</title>
+  <title>Google</title>
+  <link rel="icon" href="https://google.com/favicon.ico" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -56,9 +57,17 @@
       const input = document.getElementById("urlInput").value.trim();
       if (!input) return;
 
+      // No encoding here:
       const embedUrl = `https://bx3-cdn.gh-pages.wiki.gd/embed#${input}`;
       document.getElementById("viewer").src = embedUrl;
     }
+
+    // Add Enter key support
+    document.getElementById("urlInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        loadUrl();
+      }
+    });
   </script>
 
 </body>
