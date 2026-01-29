@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Article Publish Date Lookup</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Spectral+SC" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Montserrat|Lato" rel="stylesheet">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        
+        
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                font-family: 'Lato', serif;
+                overflow-x: hidden;
+                background-color: #f7f8fa;
+            }
+            
+            nav {
+                position: fixed;
+                z-index: 1000;
+                top: 0;
+                bottom: 0;
+                width: 200px;
+                background-color: rgb(235, 235, 235);
+                transform: translate3d(-200px, 0, 0);
+                transition: transform 0.4s ease;
+            }
+            
+            .active-nav nav {
+                transform: translate3d(0, 0, 0);
+            }
+            
+            nav ul {
+                list-style: none;
+                margin-top: 5px;
+            }
+            
+            nav ul li a {
+                text-decoration: none;
+                display: block;
+                text-align: center;
+                font-family: 'Lato', sans-serif;
+                color: black;
+                padding: 10px 0;
+                border-bottom: 1px solid lightgray;
+            }
+            
+            .nav-toggle-btn {
+                display: block;
+                position: absolute;
+                left: 200px;
+                width: 40px;
+                height: 40px;
+                margin-left: 10px;
+                margin-top: 10px;
+            }
+            
+            .nav-toggle-btn:hover {
+                cursor: pointer;
+            }
+            
+            .nav-toggle-btn span {
+                display: block;
+                width: 30px;
+                height: 5px;
+                background: #151719;
+                margin: 3px 0px;
+                border-radius: 5px;
+            }
+            
+            .content {
+                padding-top: 10px;
+                transition: transform 0.4s ease;
+                text-align: center;
+                color: #fff;
+            }
+            
+            .active-nav .content {
+                transform: translate3d(200px, 0, 0);
+            }
+            
+            .heading {
+                background-color: #1865F2;
+                width: 80%;
+                max-width: 600px;
+                margin: auto;
+                margin-bottom: 20px;
+                font-family: 'Lato', serif;
+                font-weight: bold;
+                padding: 6px 0px;
+                border-radius: 5px;
+            }
+            
+            .content-box {
+                background-color: white;
+                color: black;
+                font-family: 'Helvetica Neue', serif;
+                font-size: 20px;
+                line-height: 2em;
+                width: 80%;
+                max-width: 600px;
+                margin: auto;
+                margin-bottom: 2em;
+                border-radius: 5px;
+                padding: 0.4em 0px 1em 0em;
+                border: 1px solid lightgrey;
+            }
+            
+            .instructions {
+                font-size: 14px;
+                font-family: 'Lato';
+                line-height: 2.5em;
+                margin-bottom: 2%;
+            }
+            
+            .label {
+                color: black;
+                border-bottom: 1px solid black;
+                width: 80%;
+                margin: auto;
+                margin-top: 30px;
+            }
+            
+            .label:first-child {
+                margin-top: 0;
+            }
+            
+            .search-results {
+                font-size: 13px;
+                text-align: left;
+                width: 80%;
+                margin: auto;
+                line-height: 1.6;
+                margin-top: 10px;
+            }
+            
+            select {
+                width: 20%;
+                font-size: 14px;
+                font-family: 'Lato';
+                border: 1px solid rgba(33,36,44,0.50);
+                height: 30px;
+                cursor: pointer;
+            }
+            
+            input {
+                width: 30%;
+                padding: 5px;
+                border: 1px solid rgba(33,36,44,0.50);
+                border-radius: 4px;
+                font-family: 'Lato';
+                font-size: 14px;
+            }
+            
+            button {
+                width: 15%;
+                padding: 5px 10px 5px 10px;
+                font-size: 14px;
+                font-family: 'Lato';
+                color: black;
+                text-align: center;
+                background-color: white;
+                border: 1px solid rgba(33,36,44,0.50);
+                border-radius: 4px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            
+            button:hover {
+                border: 2px solid #1865F2;
+                color: #1865F2;
+            }
+            
+            button:active {
+                background-color: #b5cefb;
+                border-color: #1b50b3;
+                color: #1b50b3;
+            }
+            
+            .hidden {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content-lookup" class="content">
+            <h1 class="heading">Article Lookup</h1>
+            
+            <div class="content-box">
+                <input id="content-search-input" type="text" placeholder="Article URL">
+                <button id="content-search-btn">Search</button>
+            </div>
+            
+            <div class="content-box">
+                <p class="label">Publish Dates</p>
+                <div id="content-statistics" class="search-results"></div>
+            </div>
+        </div>
+        
+        <!-- Content data script -->
+        <script>
+            var contentSearchInput = document.getElementById('content-search-input');
+            var contentSearchBtn = document.getElementById('content-search-btn');
+            var contentStats = document.getElementById('content-statistics');
+            
+            var input = "";
+            var topicSlug = "";
+            var articleSlug = "";
+
+            function newDate(date) {
+                var d = new Date(date);
+                return (("0"+(d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2));
+            };
+            
+            function getArticleData(data) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].slug === articleSlug) {
+                        display = "<strong>Last Updated: </strong>" + newDate(data[i].lastUpdate) + "<br>";
+                    }
+                }
+                
+                contentStats.innerHTML = display;
+            }
+            
+            // Search type handlers
+            contentSearchBtn.addEventListener('click', function() {
+                input = contentSearchInput.value;
+                input = input.split("#")[0];
+                
+                let splitInput = input.split("/a/");
+                topicSlug = splitInput[0].split("/");
+                topicSlug = topicSlug[topicSlug.length - 1];
+                articleSlug = splitInput[1].split("?")[0];
+                    
+                let s = document.createElement('script');
+                s.setAttribute('src', "https://www.khanacademy.org/api/internal/_rg/guardians/articleupdates?lessonSlug=" + topicSlug + "&callback=" + "getArticleData");
+                document.body.appendChild(s);
+            });
+        </script>
+    </body>
+</html>
