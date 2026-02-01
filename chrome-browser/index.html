@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Multi-Browser Interface</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
@@ -86,83 +86,101 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 16px;
-      background: var(--toolbar-bg);
-      border-bottom: 1px solid var(--border-color);
-      height: 48px;
-    }
-
-    .window-controls {
-      display: flex;
-      gap: 12px;
-    }
-
-    .window-btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .close { background: #ff5f57; }
-    .minimize { background: #ffbd2e; }
-    .maximize { background: #28ca42; }
-
-    .browser-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .browser-icon {
-      width: 20px;
-      height: 20px;
-    }
-
+    /* Theme Selector */
     .theme-selector {
+      position: fixed;
+      top: 10px;
+      right: 10px;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      gap: 6px;
+      z-index: 1000;
+      background: var(--toolbar-bg);
+      border-radius: 20px;
+      padding: 8px;
+      border: 1px solid var(--border-color);
     }
 
     .theme-btn {
-      padding: 4px 12px;
-      background: var(--primary-color);
-      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
       border: none;
-      border-radius: 12px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      color: white;
+      font-weight: 600;
       font-size: 12px;
-      transition: opacity 0.2s;
     }
 
     .theme-btn:hover {
-      opacity: 0.9;
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .theme-btn.chrome { background: linear-gradient(45deg, #4285f4, #34a853, #ea4335, #fbbc05); }
+    .theme-btn.opera-gx { background: linear-gradient(45deg, #ff1b44, #00b0f4); }
+    .theme-btn.brave { background: linear-gradient(45deg, #fb542b, #1d1d1d); }
+    .theme-btn.firefox { background: linear-gradient(45deg, #ff7139, #00a7e0); }
+
+    /* Browser Header */
+    .browser-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--toolbar-bg);
+      border-bottom: 1px solid var(--border-color);
+      height: 60px;
+      gap: 16px;
+    }
+
+    .browser-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .browser-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .chrome .browser-icon { background: linear-gradient(45deg, #4285f4, #34a853); }
+    .opera-gx-theme .browser-icon { background: linear-gradient(45deg, #ff1b44, #00b0f4); }
+    .brave-theme .browser-icon { background: linear-gradient(45deg, #fb542b, #1d1d1d); }
+    .firefox-theme .browser-icon { background: linear-gradient(45deg, #ff7139, #00a7e0); }
+
+    .browser-name {
+      font-size: 18px;
+      font-weight: 600;
     }
 
     /* Navigation Bar */
     .nav-bar {
       display: flex;
       align-items: center;
-      padding: 8px 16px;
+      padding: 0 16px;
       background: var(--toolbar-bg);
       gap: 8px;
       height: 56px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .nav-btn {
       background: none;
       border: none;
       color: var(--text-color);
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -180,6 +198,11 @@
       cursor: not-allowed;
     }
 
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
     .url-bar-container {
       flex: 1;
       display: flex;
@@ -189,11 +212,22 @@
       padding: 0 16px;
       height: 40px;
       border: 1px solid var(--border-color);
+      transition: border-color 0.2s;
+    }
+
+    .url-bar-container:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
     }
 
     .lock-icon {
       color: var(--secondary-color);
       margin-right: 8px;
+    }
+
+    .lock-icon svg {
+      width: 16px;
+      height: 16px;
     }
 
     #urlInput {
@@ -215,8 +249,8 @@
       background: none;
       border: none;
       color: var(--text-color);
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -229,15 +263,33 @@
       background-color: var(--hover-color);
     }
 
+    .action-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
     /* Tabs */
     .tabs-container {
       display: flex;
       background: var(--toolbar-bg);
       padding: 0 16px;
       overflow-x: auto;
-      height: 40px;
+      height: 48px;
       border-bottom: 1px solid var(--border-color);
       scrollbar-width: thin;
+    }
+
+    .tabs-container::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .tabs-container::-webkit-scrollbar-track {
+      background: var(--toolbar-bg);
+    }
+
+    .tabs-container::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 2px;
     }
 
     .tab {
@@ -270,6 +322,9 @@
       width: 16px;
       height: 16px;
       margin-right: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .tab-title {
@@ -284,35 +339,48 @@
       margin-left: 8px;
       opacity: 0.6;
       transition: opacity 0.2s;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
     }
 
     .tab-close:hover {
       opacity: 1;
+      background-color: var(--hover-color);
     }
 
     .new-tab-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      min-width: 32px;
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
       background: var(--primary-color);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       margin-left: 4px;
       cursor: pointer;
-      font-size: 18px;
       transition: opacity 0.2s;
+      align-self: center;
     }
 
     .new-tab-btn:hover {
       opacity: 0.9;
     }
 
+    .new-tab-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
     /* Browser Content */
     .browser-content {
-      height: calc(100vh - 184px);
+      height: calc(100vh - 164px);
       position: relative;
     }
 
@@ -354,10 +422,10 @@
     /* Bookmarks Bar */
     .bookmarks-bar {
       display: flex;
-      padding: 4px 16px;
+      padding: 8px 16px;
       background: var(--toolbar-bg);
       border-bottom: 1px solid var(--border-color);
-      height: 36px;
+      height: 40px;
       align-items: center;
       gap: 16px;
     }
@@ -366,8 +434,8 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 8px;
-      border-radius: 4px;
+      padding: 6px 12px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 13px;
       transition: background-color 0.2s;
@@ -380,6 +448,9 @@
     .bookmark-icon {
       width: 16px;
       height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Status Bar */
@@ -387,46 +458,72 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 4px 16px;
+      padding: 6px 16px;
       background: var(--toolbar-bg);
       border-top: 1px solid var(--border-color);
-      height: 24px;
+      height: 28px;
       font-size: 12px;
+    }
+
+    .status-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* Responsive */
     @media (max-width: 768px) {
+      .browser-header {
+        padding: 8px 12px;
+        height: 50px;
+      }
+      
+      .browser-name {
+        font-size: 16px;
+      }
+      
+      .nav-bar {
+        padding: 0 12px;
+        height: 50px;
+      }
+      
       .tabs-container {
-        height: 48px;
+        height: 42px;
+        padding: 0 12px;
       }
       
       .tab {
         min-width: 120px;
+        padding: 0 12px;
       }
       
       .bookmarks-bar {
+        padding: 6px 12px;
         overflow-x: auto;
+      }
+      
+      .browser-content {
+        height: calc(100vh - 148px);
       }
     }
   </style>
 </head>
 <body>
-  <!-- Top Bar with Window Controls -->
-  <div class="top-bar">
-    
-    <center><div class="browser-info">
+  <!-- Theme Selector -->
+  <div class="theme-selector">
+    <button class="theme-btn chrome" onclick="setTheme('chrome')" title="Chrome Theme">C</button>
+    <button class="theme-btn opera-gx" onclick="setTheme('opera-gx')" title="Opera GX Theme">O</button>
+    <button class="theme-btn brave" onclick="setTheme('brave')" title="Brave Theme">B</button>
+    <button class="theme-btn firefox" onclick="setTheme('firefox')" title="Firefox Theme">F</button>
+  </div>
+
+  <!-- Browser Header -->
+  <div class="browser-header">
+    <div class="browser-brand">
       <div class="browser-icon">
-        <i class="fas fa-globe" style="color: var(--primary-color);"></i>
+        <i data-lucide="globe"></i>
       </div>
-      <span id="browserName">Google Chrome</span>
-    </div>
-    </center>
-    
-    <div class="theme-selector">
-      <button class="theme-btn" onclick="setTheme('chrome')">Chrome</button>
-      <button class="theme-btn" onclick="setTheme('opera-gx')">Opera GX</button>
-      <button class="theme-btn" onclick="setTheme('brave')">Brave</button>
-      <button class="theme-btn" onclick="setTheme('firefox')">Firefox</button>
+      <span class="browser-name" id="browserName">Google Chrome</span>
     </div>
   </div>
 
@@ -438,33 +535,35 @@
   <!-- Navigation Bar -->
   <div class="nav-bar">
     <button class="nav-btn" id="backBtn" title="Back">
-      <i class="fas fa-arrow-left"></i>
+      <i data-lucide="chevron-left"></i>
     </button>
     <button class="nav-btn" id="forwardBtn" title="Forward">
-      <i class="fas fa-arrow-right"></i>
+      <i data-lucide="chevron-right"></i>
     </button>
     <button class="nav-btn" id="reloadBtn" title="Reload">
-      <i class="fas fa-redo"></i>
+      <i data-lucide="refresh-cw"></i>
     </button>
     <button class="nav-btn" id="homeBtn" title="Home">
-      <i class="fas fa-home"></i>
+      <i data-lucide="home"></i>
     </button>
     
     <div class="url-bar-container">
-      <i class="fas fa-lock lock-icon" id="lockIcon"></i>
+      <div class="lock-icon" id="lockIcon">
+        <i data-lucide="lock"></i>
+      </div>
       <input type="text" id="urlInput" placeholder="Search Google or type a URL" autocomplete="off" />
       <div class="url-actions">
         <button class="action-btn" id="bookmarkBtn" title="Bookmark this page">
-          <i class="far fa-star"></i>
+          <i data-lucide="star"></i>
         </button>
         <button class="action-btn" onclick="loadUrl()" title="Go">
-          <i class="fas fa-search"></i>
+          <i data-lucide="search"></i>
         </button>
       </div>
     </div>
     
     <button class="nav-btn" id="menuBtn" title="Menu">
-      <i class="fas fa-ellipsis-v"></i>
+      <i data-lucide="menu"></i>
     </button>
   </div>
 
@@ -484,24 +583,33 @@
 
   <!-- Status Bar -->
   <div class="status-bar">
-    <div id="statusText">Ready</div>
-    <div id="securityInfo">Not secure</div>
+    <div class="status-section">
+      <i data-lucide="shield" style="width: 14px; height: 14px;"></i>
+      <span id="securityInfo">Not secure</span>
+    </div>
+    <div class="status-section">
+      <i data-lucide="info" style="width: 14px; height: 14px;"></i>
+      <span id="statusText">Ready</span>
+    </div>
   </div>
 
   <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
     // Browser state
     let currentTheme = 'chrome';
     let tabs = [];
     let currentTabIndex = 0;
     let bookmarks = [
-      { name: 'Google', url: 'https://www.google.com', icon: '🔍' },
-      { name: 'YouTube', url: 'https://www.youtube.com', icon: '▶️' },
-      { name: 'GitHub', url: 'https://github.com', icon: '🐙' },
-      { name: 'Twitter', url: 'https://twitter.com', icon: '🐦' },
-      { name: 'Reddit', url: 'https://www.reddit.com', icon: '👾' },
-      { name: 'Gmail', url: 'https://mail.google.com', icon: '📧' },
-      { name: 'Drive', url: 'https://drive.google.com', icon: '☁️' },
-      { name: 'Wikipedia', url: 'https://wikipedia.org', icon: '📚' }
+      { name: 'Google', url: 'https://www.google.com', icon: 'search' },
+      { name: 'YouTube', url: 'https://www.youtube.com', icon: 'play-circle' },
+      { name: 'GitHub', url: 'https://github.com', icon: 'github' },
+      { name: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
+      { name: 'Reddit', url: 'https://www.reddit.com', icon: 'message-square' },
+      { name: 'Gmail', url: 'https://mail.google.com', icon: 'mail' },
+      { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive' },
+      { name: 'Wikipedia', url: 'https://wikipedia.org', icon: 'book-open' }
     ];
 
     // Initialize
@@ -517,6 +625,11 @@
       
       // Load default page
       loadUrl('https://www.google.com');
+      
+      // Update Lucide icons after DOM changes
+      setInterval(() => {
+        lucide.createIcons();
+      }, 100);
     });
 
     // Tab management
@@ -526,7 +639,7 @@
         id: tabId,
         title: title,
         url: url,
-        favicon: '🌐'
+        favicon: 'globe'
       };
       
       tabs.push(tab);
@@ -536,6 +649,7 @@
       }
       
       renderTabs();
+      lucide.createIcons();
       return tabId;
     }
 
@@ -575,6 +689,7 @@
       }
       
       renderTabs();
+      lucide.createIcons();
       
       if (tabs[currentTabIndex]) {
         switchTab(currentTabIndex);
@@ -591,9 +706,13 @@
         tabEl.onclick = () => switchTab(index);
         
         tabEl.innerHTML = `
-          <span class="tab-favicon">${tab.favicon}</span>
+          <div class="tab-favicon">
+            <i data-lucide="${tab.favicon}"></i>
+          </div>
           <span class="tab-title">${tab.title || 'New Tab'}</span>
-          <span class="tab-close" onclick="closeTab(${index}, event)">✕</span>
+          <div class="tab-close" onclick="closeTab(${index}, event)">
+            <i data-lucide="x"></i>
+          </div>
         `;
         
         container.appendChild(tabEl);
@@ -602,7 +721,8 @@
       // Add new tab button
       const newTabBtn = document.createElement('button');
       newTabBtn.className = 'new-tab-btn';
-      newTabBtn.innerHTML = '+';
+      newTabBtn.title = 'New Tab';
+      newTabBtn.innerHTML = '<i data-lucide="plus"></i>';
       newTabBtn.onclick = () => createNewTab('New Tab', '');
       container.appendChild(newTabBtn);
     }
@@ -621,12 +741,16 @@
         };
         
         bookmarkEl.innerHTML = `
-          <span class="bookmark-icon">${bookmark.icon}</span>
+          <div class="bookmark-icon">
+            <i data-lucide="${bookmark.icon}"></i>
+          </div>
           <span>${bookmark.name}</span>
         `;
         
         container.appendChild(bookmarkEl);
       });
+      
+      lucide.createIcons();
     }
 
     function addBookmark() {
@@ -634,17 +758,18 @@
       if (!url) return;
       
       const name = extractDomain(url) || 'New Bookmark';
-      const icon = '⭐';
+      const icon = 'star';
       
       bookmarks.push({ name, url, icon });
       renderBookmarks();
       
       // Visual feedback
       const btn = document.getElementById('bookmarkBtn');
-      const originalIcon = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-star"></i>';
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<i data-lucide="star" style="color: var(--warning-color)"></i>';
       setTimeout(() => {
-        btn.innerHTML = originalIcon;
+        btn.innerHTML = originalHTML;
+        lucide.createIcons();
       }, 1000);
     }
 
@@ -683,14 +808,16 @@
       document.getElementById('urlInput').value = finalUrl;
       updateSecurityIndicator(finalUrl);
       updateNavigationButtons();
+      document.getElementById('statusText').textContent = 'Loading page...';
       
-      // Hide loading after a delay (iframe load event is unreliable due to CORS)
+      // Hide loading after a delay
       setTimeout(() => {
         loadingOverlay.style.display = 'none';
         if (tabs[currentTabIndex]) {
           tabs[currentTabIndex].title = extractDomain(finalUrl) || finalUrl;
           renderTabs();
         }
+        document.getElementById('statusText').textContent = 'Page loaded';
       }, 1500);
     }
 
@@ -704,14 +831,15 @@
       const securityInfo = document.getElementById('securityInfo');
       
       if (url.startsWith('https://')) {
-        lockIcon.className = 'fas fa-lock lock-icon';
+        lockIcon.innerHTML = '<i data-lucide="lock"></i>';
         lockIcon.style.color = 'var(--secondary-color)';
         securityInfo.textContent = 'Secure';
       } else {
-        lockIcon.className = 'fas fa-unlock lock-icon';
+        lockIcon.innerHTML = '<i data-lucide="unlock"></i>';
         lockIcon.style.color = 'var(--warning-color)';
         securityInfo.textContent = 'Not secure';
       }
+      lucide.createIcons();
     }
 
     // Navigation
@@ -728,6 +856,7 @@
         const viewer = document.getElementById('viewer');
         try {
           viewer.contentWindow.history.back();
+          document.getElementById('statusText').textContent = 'Navigating back...';
         } catch(e) {
           console.log('Cannot go back');
         }
@@ -737,6 +866,7 @@
         const viewer = document.getElementById('viewer');
         try {
           viewer.contentWindow.history.forward();
+          document.getElementById('statusText').textContent = 'Navigating forward...';
         } catch(e) {
           console.log('Cannot go forward');
         }
@@ -745,12 +875,14 @@
       document.getElementById('reloadBtn').onclick = () => {
         const viewer = document.getElementById('viewer');
         viewer.src = viewer.src;
+        document.getElementById('statusText').textContent = 'Reloading page...';
         
         // Show loading
         const loadingOverlay = document.getElementById('loadingOverlay');
         loadingOverlay.style.display = 'flex';
         setTimeout(() => {
           loadingOverlay.style.display = 'none';
+          document.getElementById('statusText').textContent = 'Page reloaded';
         }, 1000);
       };
       
@@ -762,24 +894,23 @@
       
       // Menu button
       document.getElementById('menuBtn').onclick = () => {
-        alert(`${document.getElementById('browserName').textContent} Menu\n\nFeatures:\n• Multiple browser themes\n• Tab management\n• Bookmarks\n• URL navigation\n• Security indicators\n• Responsive design`);
+        alert(`${document.getElementById('browserName').textContent}\n\nFeatures:\n• Multiple browser themes\n• Tab management\n• Bookmarks\n• URL navigation\n• Security indicators\n• Responsive design\n\nUsing Lucide Icons`);
       };
+      
+      // URL input focus
+      document.getElementById('urlInput').addEventListener('focus', () => {
+        document.getElementById('urlInput').select();
+      });
     }
 
     function updateNavigationButtons() {
-      const viewer = document.getElementById('viewer');
+      // Simple implementation - in a real browser, you'd check if there's history
       const backBtn = document.getElementById('backBtn');
       const forwardBtn = document.getElementById('forwardBtn');
       
-      try {
-        // These are limited due to iframe CORS restrictions
-        backBtn.disabled = false;
-        forwardBtn.disabled = false;
-      } catch(e) {
-        // Fallback
-        backBtn.disabled = true;
-        forwardBtn.disabled = true;
-      }
+      // Enable both for demo purposes
+      backBtn.disabled = false;
+      forwardBtn.disabled = false;
     }
 
     // Theme management
@@ -790,6 +921,7 @@
       switch(theme) {
         case 'chrome':
           document.getElementById('browserName').textContent = 'Google Chrome';
+          document.body.classList.add('chrome');
           break;
         case 'opera-gx':
           document.body.classList.add('opera-gx-theme');
@@ -804,38 +936,36 @@
           document.getElementById('browserName').textContent = 'Firefox';
           break;
       }
+      
+      // Update Lucide icons for the new theme
+      lucide.createIcons();
     }
 
     // Utility functions
     function extractDomain(url) {
       try {
         const urlObj = new URL(url);
-        return urlObj.hostname.replace('www.', '');
+        let domain = urlObj.hostname.replace('www.', '');
+        // Shorten long domains
+        if (domain.length > 20) {
+          domain = domain.substring(0, 17) + '...';
+        }
+        return domain;
       } catch(e) {
         return null;
       }
     }
 
-    // Window controls (visual only)
-    document.querySelectorAll('.window-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        if (this.classList.contains('close')) {
-          if (confirm('Are you sure you want to close the browser?')) {
-            document.body.innerHTML = '<h1 style="text-align:center;margin-top:50px;">Browser Closed</h1>';
-          }
-        } else if (this.classList.contains('minimize')) {
-          document.body.style.opacity = '0.7';
-          setTimeout(() => {
-            document.body.style.opacity = '1';
-          }, 300);
-        } else if (this.classList.contains('maximize')) {
-          if (document.fullscreenElement) {
-            document.exitFullscreen();
-          } else {
-            document.documentElement.requestFullscreen();
-          }
-        }
-      });
+    // Fullscreen support
+    document.addEventListener('fullscreenchange', function() {
+      const browserContent = document.querySelector('.browser-content');
+      if (document.fullscreenElement) {
+        browserContent.style.height = '100vh';
+        document.querySelector('.theme-selector').style.display = 'none';
+      } else {
+        browserContent.style.height = 'calc(100vh - 164px)';
+        document.querySelector('.theme-selector').style.display = 'flex';
+      }
     });
   </script>
 </body>
