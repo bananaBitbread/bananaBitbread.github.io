@@ -419,7 +419,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Bookmarks Bar */
+    /* Bookmarks Bar - Clean and Simple */
     .bookmarks-bar {
       display: flex;
       padding: 8px 16px;
@@ -428,21 +428,28 @@
       height: 40px;
       align-items: center;
       gap: 16px;
+      overflow-x: auto;
     }
 
     .bookmark {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 13px;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+      background: var(--tab-active-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
     }
 
     .bookmark:hover {
       background-color: var(--hover-color);
+      border-color: var(--primary-color);
     }
 
     .bookmark-icon {
@@ -464,12 +471,14 @@
       height: 28px;
       font-size: 12px;
     }
-
     .status-section {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
+    /* Custom icons */
+    
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -499,7 +508,12 @@
       
       .bookmarks-bar {
         padding: 6px 12px;
-        overflow-x: auto;
+        gap: 12px;
+      }
+      
+      .bookmark {
+        padding: 5px 10px;
+        font-size: 12px;
       }
       
       .browser-content {
@@ -588,8 +602,8 @@
       <span id="securityInfo">Not secure</span>
     </div>
     <div class="status-section">
-      <i data-lucide="info" style="width: 14px; height: 14px;"></i>
-      <span id="statusText">Ready</span>
+      <i data-lucide="gamepad-2" style="width: 14px; height: 14px;"></i>
+      <span id="statusText">Ready - Play your favorite games!</span>
     </div>
   </div>
 
@@ -601,15 +615,18 @@
     let currentTheme = 'chrome';
     let tabs = [];
     let currentTabIndex = 0;
+    
+    // Updated bookmarks with clean styling and custom icons
     let bookmarks = [
       { name: 'Google', url: 'https://www.google.com', icon: 'search' },
       { name: 'YouTube', url: 'https://www.youtube.com', icon: 'play-circle' },
       { name: 'GitHub', url: 'https://github.com', icon: 'github' },
-      { name: 'Twitter', url: 'https://twitter.com', icon: 'twitter' },
-      { name: 'Reddit', url: 'https://www.reddit.com', icon: 'message-square' },
-      { name: 'Gmail', url: 'https://mail.google.com', icon: 'mail' },
-      { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive' },
-      { name: 'Wikipedia', url: 'https://wikipedia.org', icon: 'book-open' }
+      { name: 'Geometry Dash', url: 'https://nowgg.fun/apps/robtop-games/1400/geometry-dash.html', icon: 'music' },
+      { name: 'Among Us', url: 'https://nowgg.fun/apps/innersloth-llc/4047/among-us.html', icon: 'users' },
+      { name: 'Roblox', url: 'https://nowgg.fun/apps/a/19900/b.html', icon: 'diamond' },
+      { name: 'Fortnite', url: 'https://nowgg.fun/apps/a/10004/b.html', icon: 'annoyed' },
+      { name: 'Cookie Run', url: 'https://nowgg.fun/apps/a/10019/b.html', icon: 'castle' },
+      { name: 'ChatGPT', url: 'https://chatgpt.com', icon: 'message-circle' }
     ];
 
     // Initialize
@@ -630,6 +647,9 @@
       setInterval(() => {
         lucide.createIcons();
       }, 100);
+      
+      // Update status bar with fun messages
+      updateStatusMessages();
     });
 
     // Tab management
@@ -705,15 +725,57 @@
         tabEl.className = `tab ${index === currentTabIndex ? 'active' : ''}`;
         tabEl.onclick = () => switchTab(index);
         
-        tabEl.innerHTML = `
-          <div class="tab-favicon">
-            <i data-lucide="${tab.favicon}"></i>
-          </div>
-          <span class="tab-title">${tab.title || 'New Tab'}</span>
-          <div class="tab-close" onclick="closeTab(${index}, event)">
-            <i data-lucide="x"></i>
-          </div>
-        `;
+        // Determine appropriate icon based on URL
+        let icon = tab.favicon;
+        let customIcon = false;
+        let iconHTML = '';
+        
+        if (tab.url) {
+          if (tab.url.includes('geometry-dash')) {
+            icon = 'music';
+          } else if (tab.url.includes('among-us')) {
+            icon = 'users';
+          } else if (tab.url.includes('roblox') || tab.url.includes('/b.html')) {
+            customIcon = true;
+            iconHTML = '<div class="roblox-logo"></div>';
+          } else if (tab.url.includes('fortnite')) {
+            customIcon = true;
+            iconHTML = '<div class="fortnite-icon"></div>';
+          } else if (tab.url.includes('cookie-run') || tab.url.includes('/10019/')) {
+            customIcon = true;
+            iconHTML = '<div class="cookie-icon"></div>';
+          } else if (tab.url.includes('chatgpt')) {
+            icon = 'message-square';
+          } else if (tab.url.includes('youtube')) {
+            icon = 'play-circle';
+          } else if (tab.url.includes('google')) {
+            icon = 'search';
+          } else if (tab.url.includes('github')) {
+            icon = 'github';
+          }
+        }
+        
+        if (customIcon) {
+          tabEl.innerHTML = `
+            <div class="tab-favicon">
+              ${iconHTML}
+            </div>
+            <span class="tab-title">${tab.title || 'New Tab'}</span>
+            <div class="tab-close" onclick="closeTab(${index}, event)">
+              <i data-lucide="x"></i>
+            </div>
+          `;
+        } else {
+          tabEl.innerHTML = `
+            <div class="tab-favicon">
+              <i data-lucide="${icon}"></i>
+            </div>
+            <span class="tab-title">${tab.title || 'New Tab'}</span>
+            <div class="tab-close" onclick="closeTab(${index}, event)">
+              <i data-lucide="x"></i>
+            </div>
+          `;
+        }
         
         container.appendChild(tabEl);
       });
@@ -725,6 +787,8 @@
       newTabBtn.innerHTML = '<i data-lucide="plus"></i>';
       newTabBtn.onclick = () => createNewTab('New Tab', '');
       container.appendChild(newTabBtn);
+      
+      lucide.createIcons();
     }
 
     // Bookmarks
@@ -735,14 +799,42 @@
       bookmarks.forEach(bookmark => {
         const bookmarkEl = document.createElement('div');
         bookmarkEl.className = 'bookmark';
+        bookmarkEl.title = `Open ${bookmark.name}`;
         bookmarkEl.onclick = () => {
           document.getElementById('urlInput').value = bookmark.url;
           loadUrl(bookmark.url);
+          
+          // Update status with specific message
+          if (bookmark.name.includes('Geometry Dash')) {
+            document.getElementById('statusText').textContent = 'Loading Geometry Dash - Get ready to jump!';
+          } else if (bookmark.name.includes('Among Us')) {
+            document.getElementById('statusText').textContent = 'Loading Among Us - Who is the imposter?';
+          } else if (bookmark.name.includes('Roblox')) {
+            document.getElementById('statusText').textContent = 'Loading Roblox - Infinite adventures await!';
+          } else if (bookmark.name.includes('Fortnite')) {
+            document.getElementById('statusText').textContent = 'Loading Fortnite - Battle Royale time!';
+          } else if (bookmark.name.includes('Cookie Run')) {
+            document.getElementById('statusText').textContent = 'Loading Cookie Run Kingdom - Sweet adventure!';
+          } else if (bookmark.name.includes('ChatGPT')) {
+            document.getElementById('statusText').textContent = 'Loading ChatGPT - AI assistant ready!';
+          }
         };
+        
+        // Use custom icons for specific bookmarks
+        let iconHTML = '';
+        if (bookmark.icon === 'roblox') {
+          iconHTML = '<div class="roblox-logo"></div>';
+        } else if (bookmark.icon === 'fortnite') {
+          iconHTML = '<div class="fortnite-icon"></div>';
+        } else if (bookmark.icon === 'cookie') {
+          iconHTML = '<div class="cookie-icon"></div>';
+        } else {
+          iconHTML = `<i data-lucide="${bookmark.icon}"></i>`;
+        }
         
         bookmarkEl.innerHTML = `
           <div class="bookmark-icon">
-            <i data-lucide="${bookmark.icon}"></i>
+            ${iconHTML}
           </div>
           <span>${bookmark.name}</span>
         `;
@@ -758,7 +850,28 @@
       if (!url) return;
       
       const name = extractDomain(url) || 'New Bookmark';
-      const icon = 'star';
+      let icon = 'star';
+      
+      // Auto-detect URLs for icon selection
+      if (url.includes('geometry-dash')) {
+        icon = 'music';
+      } else if (url.includes('among-us')) {
+        icon = 'users';
+      } else if (url.includes('roblox') || url.includes('/b.html')) {
+        icon = 'roblox';
+      } else if (url.includes('fortnite')) {
+        icon = 'fortnite';
+      } else if (url.includes('cookie-run') || url.includes('/10019/')) {
+        icon = 'cookie';
+      } else if (url.includes('chatgpt')) {
+        icon = 'message-square';
+      } else if (url.includes('youtube')) {
+        icon = 'play-circle';
+      } else if (url.includes('google')) {
+        icon = 'search';
+      } else if (url.includes('github')) {
+        icon = 'github';
+      }
       
       bookmarks.push({ name, url, icon });
       renderBookmarks();
@@ -791,7 +904,23 @@
       const loadingOverlay = document.getElementById('loadingOverlay');
       const loadingText = document.getElementById('loadingText');
       loadingOverlay.style.display = 'flex';
-      loadingText.textContent = `Loading ${extractDomain(finalUrl) || finalUrl}...`;
+      
+      // Custom loading messages
+      if (finalUrl.includes('geometry-dash')) {
+        loadingText.textContent = 'Loading Geometry Dash...';
+      } else if (finalUrl.includes('among-us')) {
+        loadingText.textContent = 'Loading Among Us...';
+      } else if (finalUrl.includes('roblox') || finalUrl.includes('/19900/')) {
+        loadingText.textContent = 'Loading Roblox...';
+      } else if (finalUrl.includes('fortnite') || finalUrl.includes('/10004/')) {
+        loadingText.textContent = 'Loading Fortnite...';
+      } else if (finalUrl.includes('cookie-run') || finalUrl.includes('/10019/')) {
+        loadingText.textContent = 'Loading Cookie Run Kingdom...';
+      } else if (finalUrl.includes('chatgpt')) {
+        loadingText.textContent = 'Loading ChatGPT...';
+      } else {
+        loadingText.textContent = `Loading ${extractDomain(finalUrl) || finalUrl}...`;
+      }
       
       // Update current tab
       if (tabs[currentTabIndex]) {
@@ -808,7 +937,6 @@
       document.getElementById('urlInput').value = finalUrl;
       updateSecurityIndicator(finalUrl);
       updateNavigationButtons();
-      document.getElementById('statusText').textContent = 'Loading page...';
       
       // Hide loading after a delay
       setTimeout(() => {
@@ -817,7 +945,9 @@
           tabs[currentTabIndex].title = extractDomain(finalUrl) || finalUrl;
           renderTabs();
         }
-        document.getElementById('statusText').textContent = 'Page loaded';
+        
+        // Update status with fun message
+        updateStatusMessages();
       }, 1500);
     }
 
@@ -880,9 +1010,10 @@
         // Show loading
         const loadingOverlay = document.getElementById('loadingOverlay');
         loadingOverlay.style.display = 'flex';
+        loadingText.textContent = 'Reloading...';
         setTimeout(() => {
           loadingOverlay.style.display = 'none';
-          document.getElementById('statusText').textContent = 'Page reloaded';
+          updateStatusMessages();
         }, 1000);
       };
       
@@ -894,7 +1025,12 @@
       
       // Menu button
       document.getElementById('menuBtn').onclick = () => {
-        alert(`${document.getElementById('browserName').textContent}\n\nFeatures:\n• Multiple browser themes\n• Tab management\n• Bookmarks\n• URL navigation\n• Security indicators\n• Responsive design\n\nUsing Lucide Icons`);
+        const gameLinks = bookmarks
+          .filter(b => ['Geometry Dash', 'Among Us', 'Roblox', 'Fortnite', 'Cookie Run'].includes(b.name))
+          .map(b => `• ${b.name}`)
+          .join('\n');
+        
+        alert(`${document.getElementById('browserName').textContent}\n\n🎮 Featured Games:\n${gameLinks}\n\nOther Features:\n• Multiple browser themes\n• Tab management\n• Bookmarks\n• URL navigation\n• Security indicators\n• Responsive design\n\nUsing Lucide Icons`);
       };
       
       // URL input focus
@@ -941,11 +1077,50 @@
       lucide.createIcons();
     }
 
+    // Update status bar with fun messages
+    function updateStatusMessages() {
+      const messages = [
+        'Ready - Play your favorite games!',
+        'Geometry Dash loaded - Jump to the beat! 🎵',
+        'Among Us loaded - Find the imposter! 👁️',
+        'Roblox loaded - Create and play! 🏗️',
+        'Fortnite loaded - Battle Royale time! 🔫',
+        'Cookie Run loaded - Sweet adventure! 🍪',
+        'ChatGPT loaded - AI assistant ready! 🤖',
+        'Browser ready - Game on! 🎮',
+        'All systems go - Time to play!',
+        'Connected - Gaming mode activated!'
+      ];
+      
+      // Only update if we're not showing a specific message
+      const currentStatus = document.getElementById('statusText').textContent;
+      if (!currentStatus.includes('Loading') && !currentStatus.includes('Navigating') && !currentStatus.includes('Reloading')) {
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        document.getElementById('statusText').textContent = randomMessage;
+      }
+    }
+
     // Utility functions
     function extractDomain(url) {
       try {
         const urlObj = new URL(url);
         let domain = urlObj.hostname.replace('www.', '');
+        
+        // Custom names for specific URLs
+        if (url.includes('geometry-dash')) {
+          return 'Geometry Dash';
+        } else if (url.includes('among-us')) {
+          return 'Among Us';
+        } else if (url.includes('roblox') || url.includes('/19900/')) {
+          return 'Roblox';
+        } else if (url.includes('fortnite') || url.includes('/10004/')) {
+          return 'Fortnite';
+        } else if (url.includes('cookie-run') || url.includes('/10019/')) {
+          return 'Cookie Run Kingdom';
+        } else if (url.includes('chatgpt')) {
+          return 'ChatGPT';
+        }
+        
         // Shorten long domains
         if (domain.length > 20) {
           domain = domain.substring(0, 17) + '...';
