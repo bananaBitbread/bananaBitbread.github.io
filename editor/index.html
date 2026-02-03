@@ -4,403 +4,651 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HTML Code Editor</title>
-    <!-- Load JetBrains Mono font -->
+    <!-- Load Syne Mono font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-    --bg-primary: #1e1e1e;
-    --bg-secondary: #252526;
-    --bg-tertiary: #2d2d30;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --accent: #007acc;
-    --accent-hover: #1177bb;
-    --border: #3e3e42;
-    --danger: #f14c4c;
-    --success: #4ec9b0;
-}
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #252525;
+            --bg-tertiary: #2d2d2d;
+            --bg-quaternary: #363636;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
+            --accent: #007acc;
+            --accent-light: #3399dd;
+            --accent-hover: #0a8de0;
+            --border: #404040;
+            --border-light: #4a4a4a;
+            --danger: #ff5555;
+            --danger-hover: #ff7777;
+            --success: #4ec9b0;
+            --success-hover: #6bd7c0;
+            --warning: #ffcc00;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-heavy: rgba(0, 0, 0, 0.5);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 6px;
+            --radius-lg: 8px;
+        }
 
-[data-theme="light"] {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f3f3f3;
-    --bg-tertiary: #e8e8e8;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --accent: #007acc;
-    --accent-hover: #1177bb;
-    --border: #d4d4d4;
-    --danger: #e51400;
-    --success: #008000;
-}
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f3f5;
+            --bg-quaternary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-tertiary: #868e96;
+            --accent: #007acc;
+            --accent-light: #3399dd;
+            --accent-hover: #0a8de0;
+            --border: #dee2e6;
+            --border-light: #e9ecef;
+            --danger: #ff4444;
+            --danger-hover: #ff6666;
+            --success: #28a745;
+            --success-hover: #34ce57;
+            --warning: #ffc107;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --shadow-heavy: rgba(0, 0, 0, 0.15);
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: "Inter", sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    transition: background-color 0.3s, color 0.3s;
-    height: 100vh;
-    overflow: hidden;
-}
+        body {
+            font-family: "Syne", sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            height: 100vh;
+            overflow: hidden;
+        }
 
-/* Smooth overall transitions */
-.app-container,
-.sidebar,
-.header,
-.editor-container,
-.preview-container {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
+        button {
+            font-family: "Syne", sans-serif;
+        }
 
-.app-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-}
+        /* Smooth overall transitions */
+        .app-container,
+        .sidebar,
+        .header,
+        .editor-container,
+        .preview-container {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
 
-/* Header Styles */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    height: 60px;
-    flex-shrink: 0;
-    animation: fadeDown 0.4s ease;
-}
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    font-size: 18px;
-}
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            height: 64px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 10px var(--shadow);
+            animation: fadeDown 0.4s ease;
+            position: relative;
+            z-index: 10;
+        }
 
-.logo-icon {
-    width: 24px;
-    height: 24px;
-    color: var(--accent);
-    transition: transform 0.3s;
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+        }
 
-.logo:hover .logo-icon {
-    transform: rotate(10deg) scale(1.1);
-}
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--accent);
+            transition: var(--transition);
+            filter: drop-shadow(0 0 8px rgba(0, 122, 204, 0.3));
+        }
 
-.header-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
+        .logo:hover .logo-icon {
+            transform: rotate(15deg) scale(1.15);
+            filter: drop-shadow(0 0 12px rgba(0, 122, 204, 0.5));
+        }
 
-.btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 8px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    width: 36px;
-    height: 36px;
-}
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-.btn:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    transform: translateY(-2px);
-}
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
 
-.btn-danger:hover {
-    background: var(--danger);
-    border-color: var(--danger);
-    transform: translateY(-2px);
-}
+        .btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+        }
 
-.btn-text {
-    width: auto;
-    padding: 8px 12px;
-    gap: 8px;
-}
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
 
-.btn-icon {
-    width: 18px;
-    height: 18px;
-    transition: transform 0.2s ease;
-}
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
 
-.btn:hover .btn-icon {
-    transform: scale(1.1);
-}
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            border-color: var(--danger-hover);
+            box-shadow: 0 4px 12px rgba(255, 85, 85, 0.3);
+        }
 
-/* Main Content */
-.main-content {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    height: calc(100vh - 60px);
-    animation: fadeUp 0.4s ease;
-}
+        .btn-success {
+            background: var(--success);
+            border-color: var(--success);
+        }
 
-/* Sidebar */
-.sidebar {
-    width: 250px;
-    background-color: var(--bg-secondary);
-    border-right: 1px solid var(--border);
-    padding: 15px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    overflow-y: auto;
-    flex-shrink: 0;
-    animation: slideInLeft 0.5s ease;
-}
+        .btn-success:hover {
+            background: var(--success-hover);
+            border-color: var(--success-hover);
+            box-shadow: 0 4px 12px rgba(78, 201, 176, 0.3);
+        }
 
-.sidebar.collapsed {
-    transform: translateX(-100%);
-    width: 0;
-    padding: 0;
-    opacity: 0;
-}
+        .btn-text {
+            width: auto;
+            padding: 10px 16px;
+            gap: 10px;
+            height: auto;
+            min-height: 40px;
+            font-weight: 500;
+        }
 
-.sidebar-section {
-    margin-bottom: 25px;
-}
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            transition: var(--transition);
+        }
 
-.sidebar-title {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: var(--text-secondary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .btn:hover .btn-icon {
+            transform: scale(1.1);
+        }
 
-.history-item {
-    padding: 8px 10px;
-    background: var(--bg-tertiary);
-    border-radius: 4px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.25s ease, transform 0.2s ease;
-}
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - 64px);
+            animation: fadeUp 0.4s ease;
+        }
 
-.history-item:hover {
-    background: var(--accent);
-    transform: translateX(3px);
-}
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            transition: var(--transition);
+            overflow-y: auto;
+            flex-shrink: 0;
+            animation: slideInLeft 0.5s ease;
+            box-shadow: 2px 0 8px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
 
-.history-item-time {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            border-right: none;
+        }
 
-.history-actions {
-    display: flex;
-    gap: 5px;
-}
+        .sidebar-section {
+            margin-bottom: 0;
+        }
 
-.history-action-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
 
-.history-action-btn:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.1);
-}
+        .history-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
 
-/* Editor Area */
-.editor-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    min-width: 0;
-}
+        .history-item:hover {
+            background: var(--bg-quaternary);
+            transform: translateX(4px);
+            border-color: var(--accent);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
 
-.editor-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    height: 50px;
-    flex-shrink: 0;
-    animation: fadeDown 0.4s ease;
-}
+        .history-item.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
 
-.editor-toolbar-left,
-.editor-toolbar-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
+        .history-item.active .history-item-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
 
-.editor-wrapper {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    min-height: 0;
-}
+        .history-item-time {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            transition: var(--transition);
+        }
 
-#editor {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
+        .history-actions {
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: var(--transition);
+        }
 
-.editor-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    font-size: 16px;
-    color: var(--text-secondary);
-    background: var(--bg-primary);
-    font-family: 'JetBrains Mono', monospace;
-    opacity: 0;
-    animation: fadeIn 0.6s forwards;
-}
+        .history-item:hover .history-actions {
+            opacity: 1;
+        }
 
-.editor-loading.hidden {
-    display: none;
-}
+        .history-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            width: 24px;
+            height: 24px;
+        }
 
-/* Preview */
-.preview-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border-left: 1px solid var(--border);
-    min-width: 0;
-    animation: fadeIn 0.5s ease;
-}
+        .history-action-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
 
-.preview-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: var(--bg-secondary);
-    border-bottom: 1px solid var(--border);
-    height: 50px;
-    flex-shrink: 0;
-}
+        /* Editor Area */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-width: 0;
+        }
 
-.preview-content {
-    flex: 1;
-    border: none;
-    background: white;
-    min-height: 0;
-    animation: fadeIn 0.3s ease;
-}
+        .editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            height: 56px;
+            flex-shrink: 0;
+            animation: fadeDown 0.4s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
 
-/* Popup Manager */
-.popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
+        .editor-toolbar-left,
+        .editor-toolbar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-.popup-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+            background: var(--bg-primary);
+        }
 
-.popup {
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    padding: 20px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    transform: scale(0.9);
-    opacity: 0;
-    animation: popupIn 0.3s forwards ease;
-}
+        #editor {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
 
-.popup-title {
-    font-size: 18px;
-    margin-bottom: 15px;
-    font-weight: 500;
-}
+        .editor-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 16px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            font-family: 'Syne Mono', monospace;
+            opacity: 0;
+            animation: fadeIn 0.6s forwards;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-.popup-content {
-    margin-bottom: 20px;
-    color: var(--text-secondary);
-}
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-.popup-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
+        .editor-loading.hidden {
+            display: none;
+        }
 
-/* Animations */
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
+        /* Preview */
+        .preview-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border);
+            min-width: 0;
+            animation: fadeIn 0.5s ease;
+            background: var(--bg-primary);
+        }
 
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            height: 56px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
 
-@keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        .preview-header h3 {
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-@keyframes slideInLeft {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
+        .preview-content {
+            flex: 1;
+            border: none;
+            background: white;
+            min-height: 0;
+            animation: fadeIn 0.3s ease;
+        }
 
-@keyframes popupIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
+        /* Status indicators */
+        .status-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 20px var(--shadow-heavy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+        }
 
+        .status-indicator.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-dot.error {
+            background: var(--danger);
+        }
+
+        .status-dot.warning {
+            background: var(--warning);
+        }
+
+        /* Popup Manager */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 420px;
+            max-width: 90%;
+            box-shadow: 0 20px 40px var(--shadow-heavy);
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            animation: popupIn 0.4s forwards cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border);
+        }
+
+        .popup-title {
+            font-size: 20px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .popup-content {
+            margin-bottom: 24px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes popupIn {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 10px 16px;
+                height: 56px;
+            }
+            
+            .logo {
+                font-size: 18px;
+            }
+            
+            .sidebar {
+                position: absolute;
+                height: calc(100% - 56px);
+                z-index: 100;
+                background: var(--bg-secondary);
+            }
+            
+            .editor-toolbar {
+                padding: 10px 16px;
+            }
+        }
+
+        /* Tooltip */
+        [data-tooltip] {
+            position: relative;
+        }
+
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            pointer-events: none;
+            border: 1px solid var(--border);
+            z-index: 1000;
+            margin-bottom: 8px;
+        }
+
+        [data-tooltip]:hover:before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 16px 0;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
@@ -411,10 +659,10 @@ body {
                 <span>HTML Editor</span>
             </div>
             <div class="header-controls">
-                <button class="btn" id="theme-toggle" title="Toggle theme">
+                <button class="btn" id="theme-toggle" title="Toggle theme" data-tooltip="Toggle theme">
                     <i data-lucide="moon" class="btn-icon" id="theme-icon"></i>
                 </button>
-                <button class="btn" id="sidebar-toggle" title="Toggle sidebar">
+                <button class="btn" id="sidebar-toggle" title="Toggle sidebar" data-tooltip="Toggle sidebar">
                     <i data-lucide="sidebar" class="btn-icon" id="sidebar-icon"></i>
                 </button>
             </div>
@@ -425,33 +673,44 @@ body {
                 <div class="sidebar-section">
                     <div class="sidebar-title">
                         <span>History</span>
-                        <button class="btn" id="clear-history" title="Clear history">
+                        <button class="btn" id="clear-history" title="Clear history" data-tooltip="Clear all history">
                             <i data-lucide="trash-2" class="btn-icon"></i>
                         </button>
                     </div>
                     <div id="history-list"></div>
                 </div>
+                <div class="divider"></div>
                 <div class="sidebar-section">
                     <div class="sidebar-title">
                         <span>Tools</span>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <button class="btn btn-text" id="format-btn">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="btn btn-text" id="format-btn" data-tooltip="Format code with proper indentation">
                             <i data-lucide="align-left" class="btn-icon"></i>
-                            Format
+                            Format Code
                         </button>
-                        <button class="btn btn-text" id="minify-btn">
+                        <button class="btn btn-text" id="minify-btn" data-tooltip="Remove all unnecessary whitespace">
                             <i data-lucide="minimize-2" class="btn-icon"></i>
-                            Minify
+                            Minify Code
                         </button>
-                        <button class="btn btn-text" id="import-btn">
+                        <button class="btn btn-text" id="import-btn" data-tooltip="Import HTML file">
                             <i data-lucide="upload" class="btn-icon"></i>
-                            Import
+                            Import File
                         </button>
-                        <button class="btn btn-text" id="export-btn">
+                        <button class="btn btn-text" id="export-btn" data-tooltip="Export as HTML file">
                             <i data-lucide="download" class="btn-icon"></i>
-                            Export
+                            Export File
                         </button>
+                    </div>
+                </div>
+                <div class="sidebar-section" style="margin-top: auto;">
+                    <div class="sidebar-title">
+                        <span>Info</span>
+                    </div>
+                    <div style="color: var(--text-tertiary); font-size: 12px; line-height: 1.5;">
+                        <p>Auto-saves every 5 minutes</p>
+                        <p>Up to 20 history items</p>
+                        <p>Supports HTML, CSS, JavaScript</p>
                     </div>
                 </div>
             </aside>
@@ -459,32 +718,40 @@ body {
             <div class="editor-container">
                 <div class="editor-toolbar">
                     <div class="editor-toolbar-left">
-                        <button class="btn" id="save-btn" title="Save">
+                        <button class="btn" id="save-btn" title="Save" data-tooltip="Save to history">
                             <i data-lucide="save" class="btn-icon"></i>
                         </button>
-                        <button class="btn" id="preview-btn" title="Preview">
+                        <button class="btn" id="preview-btn" title="Preview" data-tooltip="Toggle preview">
                             <i data-lucide="eye" class="btn-icon"></i>
                         </button>
-                        <button class="btn" id="new-tab-btn" title="Open in new tab">
+                        <button class="btn" id="new-tab-btn" title="Open in new tab" data-tooltip="Open in new tab">
                             <i data-lucide="external-link" class="btn-icon"></i>
                         </button>
+                        <div style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></div>
+                        <span style="font-size: 12px; color: var(--text-tertiary);" id="char-count">0 chars</span>
                     </div>
                     <div class="editor-toolbar-right">
-                        <button class="btn" id="fullscreen-btn" title="Fullscreen">
+                        <button class="btn" id="fullscreen-btn" title="Fullscreen" data-tooltip="Toggle fullscreen">
                             <i data-lucide="maximize" class="btn-icon"></i>
                         </button>
                     </div>
                 </div>
                 <div class="editor-wrapper">
-                    <div class="editor-loading" id="editor-loading">Loading Monaco Editor...</div>
+                    <div class="editor-loading" id="editor-loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading Monaco Editor...</span>
+                    </div>
                     <div id="editor"></div>
                 </div>
             </div>
 
             <div class="preview-container" id="preview-container">
                 <div class="preview-header">
-                    <h3>Preview</h3>
-                    <button class="btn" id="close-preview" title="Close preview">
+                    <h3>
+                        <i data-lucide="layout" style="width: 18px; height: 18px;"></i>
+                        Preview
+                    </h3>
+                    <button class="btn" id="close-preview" title="Close preview" data-tooltip="Close preview">
                         <i data-lucide="x" class="btn-icon"></i>
                     </button>
                 </div>
@@ -504,28 +771,42 @@ body {
         </div>
     </div>
 
+    <!-- Status Indicator -->
+    <div class="status-indicator" id="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-message">Operation completed</span>
+    </div>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
-        // App state
+        // Enhanced App state
         const state = {
             editor: null,
             history: JSON.parse(localStorage.getItem('editor-history')) || [],
             saveInterval: null,
-            isPreviewVisible: true
+            isPreviewVisible: true,
+            currentHistoryIndex: -1,
+            autoSaveEnabled: true,
+            theme: localStorage.getItem('editor-theme') || 'dark'
         };
 
-        // Wait for fonts to load before initializing Monaco
+        // Enhanced font loading
         function waitForFonts() {
             return new Promise((resolve) => {
-                if (document.fonts && document.fonts.ready) {
-                    document.fonts.ready.then(resolve);
-                } else {
-                    setTimeout(resolve, 1000);
-                }
+                const syne = new FontFace('Syne', 'url(https://fonts.gstatic.com/s/syne/v15/8vIS7w4qzmVxsWxjBZRjr0FKM_04uQ6kTY67KA.woff2)');
+                const syneMono = new FontFace('Syne Mono', 'url(https://fonts.gstatic.com/s/synemono/v1/3JTySDDxiLsXhO6mQjsUJBwap2w.woff2)');
+                
+                Promise.all([syne.load(), syneMono.load()]).then(() => {
+                    document.fonts.add(syne);
+                    document.fonts.add(syneMono);
+                    resolve();
+                }).catch(() => {
+                    setTimeout(resolve, 500);
+                });
             });
         }
 
-        // Initialize the application
+        // Enhanced initialization
         async function initApp() {
             lucide.createIcons();
             setupEventListeners();
@@ -534,19 +815,26 @@ body {
             renderHistory();
             startAutoSave();
             updatePreview();
+            updateCharCount();
+            
+            // Show welcome message
+            setTimeout(() => {
+                showStatus('Editor ready!', 'success');
+            }, 1000);
         }
 
-        // Theme management
+        // Enhanced theme management
         function detectSystemTheme() {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
         function setTheme(theme) {
+            state.theme = theme;
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('editor-theme', theme);
             updateThemeIcon(theme);
             
-            if (state.editor) {
+            if (state.editor && monaco) {
                 const monacoTheme = theme === 'dark' ? 'vs-dark' : 'vs';
                 monaco.editor.setTheme(monacoTheme);
             }
@@ -558,7 +846,7 @@ body {
             lucide.createIcons();
         }
 
-        // Monaco Editor initialization
+        // Enhanced Monaco Editor initialization
         function initMonacoEditor() {
             if (window.require) {
                 loadMonaco();
@@ -570,8 +858,14 @@ body {
             script.onload = loadMonaco;
             script.onerror = () => {
                 console.error('Failed to load Monaco Editor');
-                document.getElementById('editor-loading').textContent = 'Failed to load editor. Using fallback.';
-                initFallbackEditor();
+                const loadingElement = document.getElementById('editor-loading');
+                loadingElement.innerHTML = `
+                    <div style="color: var(--danger); font-size: 24px;">⚠️</div>
+                    <span>Failed to load Monaco Editor</span>
+                    <button class="btn btn-text" onclick="initFallbackEditor()" style="margin-top: 10px;">
+                        Use Fallback Editor
+                    </button>
+                `;
             };
             document.head.appendChild(script);
         }
@@ -586,14 +880,27 @@ body {
             require(['vs/editor/editor.main'], function() {
                 const container = document.getElementById('editor');
                 const loadingElement = document.getElementById('editor-loading');
-                const initialTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'vs';
+                const currentTheme = state.theme === 'dark' ? 'vs-dark' : 'vs';
                 
                 try {
+                    // Define custom theme
                     monaco.editor.defineTheme('custom-theme', {
-                        base: initialTheme,
+                        base: currentTheme,
                         inherit: true,
-                        rules: [],
-                        colors: {}
+                        rules: [
+                            { token: 'comment', foreground: '6A9955' },
+                            { token: 'keyword', foreground: '569CD6' },
+                            { token: 'string', foreground: 'CE9178' },
+                            { token: 'number', foreground: 'B5CEA8' },
+                            { token: 'tag', foreground: '4EC9B0' },
+                        ],
+                        colors: {
+                            'editor.background': state.theme === 'dark' ? '#1a1a1a' : '#f8f9fa',
+                            'editor.foreground': state.theme === 'dark' ? '#f0f0f0' : '#212529',
+                            'editor.lineHighlightBackground': state.theme === 'dark' ? '#2d2d2d' : '#f1f3f5',
+                            'editorLineNumber.foreground': state.theme === 'dark' ? '#858585' : '#868e96',
+                            'editor.selectionBackground': state.theme === 'dark' ? '#264F78' : '#3399dd33',
+                        }
                     });
 
                     state.editor = monaco.editor.create(container, {
@@ -605,42 +912,65 @@ body {
     <title>My HTML Page</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
         h1 {
             color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         p {
-            line-height: 1.6;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.1em;
+        }
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to My HTML Page</h1>
-        <p>This is a sample HTML page. Start editing to create your own content!</p>
-        <p>Try changing the text or styles and see the live preview update.</p>
+        <h1>✨ Welcome to HTML Editor</h1>
+        <p>This is a sample HTML page. Start editing to create your own amazing content!</p>
+        <p>Try changing the text or styles and see the <span class="highlight">live preview</span> update in real-time.</p>
+        <p>You can format, minify, import, and export your code using the sidebar tools.</p>
     </div>
+    <script>
+        console.log('Hello from the editor!');
+    <\/script>
 </body>
 </html>`,
                         language: 'html',
                         theme: 'custom-theme',
-                        fontSize: 14,
-                        fontFamily: "'JetBrains Mono', 'Courier New', monospace",
+                        fontSize: 15,
+                        fontFamily: "'Syne Mono', 'Cascadia Code', 'Consolas', monospace",
                         fontLigatures: true,
                         automaticLayout: true,
-                        minimap: { enabled: false },
+                        minimap: { 
+                            enabled: true,
+                            scale: 2,
+                            renderCharacters: false
+                        },
                         scrollBeyondLastLine: false,
                         wordWrap: 'on',
                         lineNumbers: 'on',
@@ -648,43 +978,124 @@ body {
                         lineNumbersMinChars: 3,
                         renderLineHighlight: 'all',
                         cursorBlinking: 'smooth',
-                        smoothScrolling: true
+                        smoothScrolling: true,
+                        cursorSmoothCaretAnimation: 'on',
+                        formatOnPaste: true,
+                        formatOnType: true,
+                        links: true,
+                        contextmenu: true,
+                        quickSuggestions: true,
+                        suggestOnTriggerCharacters: true,
+                        acceptSuggestionOnEnter: 'on',
+                        tabCompletion: 'on',
+                        wordBasedSuggestions: true,
+                        parameterHints: { enabled: true },
+                        hover: { enabled: true, delay: 300 }
                     });
 
                     loadingElement.classList.add('hidden');
                     
-                    state.editor.onDidChangeModelContent(updatePreview);
+                    // Enhanced event listeners
+                    state.editor.onDidChangeModelContent(() => {
+                        updatePreview();
+                        updateCharCount();
+                    });
                     
-                    window.addEventListener('resize', () => {
-                        if (state.editor) {
-                            state.editor.layout();
+                    state.editor.onKeyDown((e) => {
+                        // Add custom keyboard shortcuts
+                        if (e.ctrlKey && e.key === 's') {
+                            e.preventDefault();
+                            saveToHistory();
+                            showStatus('Saved to history', 'success');
+                        }
+                        
+                        if (e.ctrlKey && e.key === 'f') {
+                            e.preventDefault();
+                            state.editor.getAction('actions.find').run();
                         }
                     });
                     
+                    window.addEventListener('resize', () => {
+                        if (state.editor) {
+                            setTimeout(() => state.editor.layout(), 100);
+                        }
+                    });
+                    
+                    // Initial layout
+                    setTimeout(() => state.editor.layout(), 100);
+                    
                 } catch (error) {
                     console.error('Error initializing Monaco Editor:', error);
-                    loadingElement.textContent = 'Error loading editor. Using fallback.';
-                    initFallbackEditor();
+                    loadingElement.innerHTML = `
+                        <div style="color: var(--danger); font-size: 24px;">⚠️</div>
+                        <span>Error loading editor</span>
+                        <button class="btn btn-text" onclick="initFallbackEditor()" style="margin-top: 10px;">
+                            Use Fallback Editor
+                        </button>
+                    `;
                 }
             });
         }
 
+        // Enhanced fallback editor
         function initFallbackEditor() {
             const container = document.getElementById('editor');
             const loadingElement = document.getElementById('editor-loading');
             
-            container.innerHTML = `<textarea style="width:100%; height:100%; background:var(--bg-primary); color:var(--text-primary); border:none; padding:20px; font-family:'JetBrains Mono', monospace; font-size:14px; resize:none; outline:none;">${getInitialContent()}</textarea>`;
+            container.innerHTML = `
+                <div style="position: relative; height: 100%;">
+                    <textarea 
+                        id="fallback-editor"
+                        style="
+                            width:100%; 
+                            height:100%; 
+                            background:var(--bg-primary); 
+                            color:var(--text-primary); 
+                            border:none; 
+                            padding:20px; 
+                            font-family:'Syne Mono', monospace; 
+                            font-size:15px; 
+                            resize:none; 
+                            outline:none;
+                            line-height:1.6;
+                        "
+                        spellcheck="false"
+                    >${getInitialContent()}</textarea>
+                    <div style="
+                        position: absolute;
+                        bottom: 20px;
+                        right: 20px;
+                        background: var(--bg-secondary);
+                        padding: 8px 16px;
+                        border-radius: var(--radius);
+                        font-size: 12px;
+                        color: var(--text-secondary);
+                        border: 1px solid var(--border);
+                    ">
+                        Fallback Mode
+                    </div>
+                </div>
+            `;
+            
+            const textarea = container.querySelector('textarea');
             
             state.editor = {
-                getValue: () => container.querySelector('textarea').value,
-                setValue: (value) => container.querySelector('textarea').value = value,
+                getValue: () => textarea.value,
+                setValue: (value) => {
+                    textarea.value = value;
+                    textarea.dispatchEvent(new Event('input'));
+                },
                 onDidChangeModelContent: (callback) => {
-                    container.querySelector('textarea').addEventListener('input', callback);
-                }
+                    textarea.addEventListener('input', callback);
+                },
+                focus: () => textarea.focus()
             };
             
             loadingElement.classList.add('hidden');
             state.editor.onDidChangeModelContent(updatePreview);
+            state.editor.focus();
+            
+            showStatus('Using fallback editor', 'warning');
         }
 
         function getInitialContent() {
@@ -696,49 +1107,78 @@ body {
     <title>My HTML Page</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
         h1 {
             color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         p {
-            line-height: 1.6;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.1em;
+        }
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to My HTML Page</h1>
-        <p>This is a sample HTML page. Start editing to create your own content!</p>
-        <p>Try changing the text or styles and see the live preview update.</p>
+        <h1>✨ Welcome to HTML Editor</h1>
+        <p>This is a sample HTML page. Start editing to create your own amazing content!</p>
+        <p>Try changing the text or styles and see the <span class="highlight">live preview</span> update in real-time.</p>
+        <p>You can format, minify, import, and export your code using the sidebar tools.</p>
     </div>
+    <script>
+        console.log('Hello from the editor!');
+    <\/script>
 </body>
 </html>`;
         }
 
-        // History management
+        // Enhanced history management
         function saveToHistory() {
             if (!state.editor) return;
             
             const content = state.editor.getValue();
-            const timestamp = new Date().toLocaleString();
+            const timestamp = new Date().toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
             
+            // Don't save if identical to last entry
             if (state.history.length > 0 && state.history[0].content === content) {
                 return;
             }
             
-            state.history.unshift({ content, timestamp });
+            state.history.unshift({ 
+                content, 
+                timestamp,
+                id: Date.now()
+            });
             
             if (state.history.length > 20) {
                 state.history = state.history.slice(0, 20);
@@ -746,6 +1186,9 @@ body {
             
             localStorage.setItem('editor-history', JSON.stringify(state.history));
             renderHistory();
+            state.currentHistoryIndex = 0;
+            
+            return state.history[0];
         }
 
         function renderHistory() {
@@ -753,23 +1196,35 @@ body {
             historyList.innerHTML = '';
             
             if (state.history.length === 0) {
-                historyList.innerHTML = '<div style="color: var(--text-secondary); font-style: italic; text-align: center; padding: 10px;">No history yet</div>';
+                historyList.innerHTML = `
+                    <div style="
+                        color: var(--text-tertiary); 
+                        font-style: italic; 
+                        text-align: center; 
+                        padding: 30px 10px;
+                        font-size: 14px;
+                    ">
+                        <i data-lucide="history" style="width: 24px; height: 24px; margin-bottom: 10px;"></i>
+                        <div>No history yet</div>
+                    </div>
+                `;
+                lucide.createIcons();
                 return;
             }
             
             state.history.forEach((item, index) => {
                 const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
+                historyItem.className = `history-item ${index === state.currentHistoryIndex ? 'active' : ''}`;
                 historyItem.innerHTML = `
                     <div>
-                        <div>Snapshot ${state.history.length - index}</div>
+                        <div style="font-weight: 500; margin-bottom: 4px;">Snapshot ${index + 1}</div>
                         <div class="history-item-time">${item.timestamp}</div>
                     </div>
                     <div class="history-actions">
-                        <button class="history-action-btn" data-index="${index}" title="Load">
+                        <button class="history-action-btn" data-id="${item.id}" title="Load this version">
                             <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
                         </button>
-                        <button class="history-action-btn" data-index="${index}" title="Delete">
+                        <button class="history-action-btn" data-id="${item.id}" title="Delete this version">
                             <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
                         </button>
                     </div>
@@ -779,13 +1234,23 @@ body {
             
             lucide.createIcons();
             
+            // Add event listeners
+            document.querySelectorAll('.history-item').forEach((item, index) => {
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.history-action-btn')) {
+                        loadHistoryItem(index);
+                    }
+                });
+            });
+            
             document.querySelectorAll('.history-action-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const index = parseInt(btn.getAttribute('data-index'));
+                    const id = parseInt(btn.getAttribute('data-id'));
                     const isLoad = btn.querySelector('[data-lucide="rotate-ccw"]') !== null;
+                    const index = state.history.findIndex(item => item.id === id);
                     
                     if (isLoad) {
-                        state.editor.setValue(state.history[index].content);
+                        loadHistoryItem(index);
                     } else {
                         showPopup(
                             'Delete History Item',
@@ -794,6 +1259,7 @@ body {
                                 state.history.splice(index, 1);
                                 localStorage.setItem('editor-history', JSON.stringify(state.history));
                                 renderHistory();
+                                showStatus('History item deleted', 'success');
                             }
                         );
                     }
@@ -802,11 +1268,42 @@ body {
             });
         }
 
-        function startAutoSave() {
-            state.saveInterval = setInterval(saveToHistory, 5 * 60 * 1000);
+        function loadHistoryItem(index) {
+            if (state.history[index]) {
+                state.editor.setValue(state.history[index].content);
+                state.currentHistoryIndex = index;
+                renderHistory();
+                showStatus(`Loaded snapshot ${index + 1}`, 'success');
+            }
         }
 
-        // Popup Manager
+        function startAutoSave() {
+            if (state.autoSaveEnabled) {
+                state.saveInterval = setInterval(() => {
+                    const savedItem = saveToHistory();
+                    if (savedItem) {
+                        showStatus('Auto-saved to history', 'success');
+                    }
+                }, 5 * 60 * 1000); // Every 5 minutes
+            }
+        }
+
+        // Enhanced status notifications
+        function showStatus(message, type = 'success') {
+            const indicator = document.getElementById('status-indicator');
+            const dot = document.getElementById('status-dot');
+            const messageEl = document.getElementById('status-message');
+            
+            dot.className = `status-dot ${type}`;
+            messageEl.textContent = message;
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+
+        // Enhanced popup manager
         function showPopup(title, content, confirmCallback) {
             const overlay = document.getElementById('popup-overlay');
             const popupTitle = document.getElementById('popup-title');
@@ -830,35 +1327,82 @@ body {
             };
             
             cancelBtn.onclick = closePopup;
+            
+            // Close on escape key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') closePopup();
+            };
+            document.addEventListener('keydown', escapeHandler);
+            
+            // Remove listener after popup closes
+            setTimeout(() => {
+                document.removeEventListener('keydown', escapeHandler);
+            }, 100);
         }
 
-        // Code operations
+        // Enhanced code operations
         function formatCode() {
             if (!state.editor) return;
-            const content = state.editor.getValue();
-            const formatted = content
-                .replace(/(>)(<)(\/*)/g, '$1\n$2$3')
-                .replace(/(\s*)<([^>]+)>(.*?)<\/\2>/g, '$1<$2>$3</$2>');
-            state.editor.setValue(formatted);
+            try {
+                const content = state.editor.getValue();
+                // Simple formatter for HTML
+                let depth = 0;
+                const formatted = content
+                    .replace(/</g, '\n<')
+                    .replace(/>/g, '>\n')
+                    .split('\n')
+                    .filter(line => line.trim())
+                    .map(line => {
+                        if (line.includes('</')) depth--;
+                        const indented = '    '.repeat(Math.max(0, depth)) + line.trim();
+                        if (line.includes('<') && !line.includes('</') && !line.includes('/>')) depth++;
+                        return indented;
+                    })
+                    .join('\n')
+                    .trim();
+                
+                state.editor.setValue(formatted);
+                showStatus('Code formatted', 'success');
+            } catch (error) {
+                showStatus('Formatting failed', 'error');
+            }
         }
 
         function minifyCode() {
             if (!state.editor) return;
-            const content = state.editor.getValue();
-            const minified = content.replace(/\s+/g, ' ').replace(/>\s+</g, '><').trim();
-            state.editor.setValue(minified);
+            try {
+                const content = state.editor.getValue();
+                const minified = content
+                    .replace(/\s+/g, ' ')
+                    .replace(/>\s+</g, '><')
+                    .replace(/<!--.*?-->/g, '')
+                    .trim();
+                
+                state.editor.setValue(minified);
+                showStatus('Code minified', 'success');
+            } catch (error) {
+                showStatus('Minification failed', 'error');
+            }
         }
 
         function importFile() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.html,.htm,.txt';
+            input.accept = '.html,.htm,.txt,.css,.js';
             input.onchange = e => {
                 const file = e.target.files[0];
+                if (!file) return;
+                
                 const reader = new FileReader();
                 reader.onload = event => {
                     state.editor.setValue(event.target.result);
-                    saveToHistory();
+                    const savedItem = saveToHistory();
+                    if (savedItem) {
+                        showStatus(`Imported "${file.name}"`, 'success');
+                    }
+                };
+                reader.onerror = () => {
+                    showStatus('Failed to import file', 'error');
                 };
                 reader.readAsText(file);
             };
@@ -868,16 +1412,19 @@ body {
         function exportFile() {
             if (!state.editor) return;
             const content = state.editor.getValue();
-            const blob = new Blob([content], { type: 'text/html' });
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'code.html';
+            a.download = `code-${Date.now()}.html`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showStatus('File exported', 'success');
         }
 
-        // Preview functions
+        // Enhanced preview functions
         function updatePreview() {
             if (!state.editor) return;
             const content = state.editor.getValue();
@@ -888,29 +1435,72 @@ body {
             iframeDoc.close();
         }
 
+        function updateCharCount() {
+            if (!state.editor) return;
+            const content = state.editor.getValue();
+            const charCount = content.length;
+            const lineCount = content.split('\n').length;
+            document.getElementById('char-count').textContent = 
+                `${charCount.toLocaleString()} chars • ${lineCount} lines`;
+        }
+
         function openInNewTab() {
             if (!state.editor) return;
             const content = state.editor.getValue();
             const newWindow = window.open();
-            newWindow.document.write(content);
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Preview - HTML Editor</title>
+                    <style>
+                        body { margin: 0; padding: 20px; background: #f5f5f5; }
+                        .header { 
+                            background: #333; 
+                            color: white; 
+                            padding: 15px; 
+                            margin: -20px -20px 20px -20px;
+                            font-family: sans-serif;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">Preview - Generated from HTML Editor</div>
+                    ${content}
+                </body>
+                </html>
+            `);
             newWindow.document.close();
+            showStatus('Opened in new tab', 'success');
         }
 
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen();
-            } else if (document.exitFullscreen) {
+                document.documentElement.requestFullscreen().catch(console.error);
+                document.getElementById('fullscreen-btn').innerHTML = 
+                    '<i data-lucide="minimize" class="btn-icon"></i>';
+                lucide.createIcons();
+                showStatus('Entered fullscreen', 'success');
+            } else {
                 document.exitFullscreen();
+                document.getElementById('fullscreen-btn').innerHTML = 
+                    '<i data-lucide="maximize" class="btn-icon"></i>';
+                lucide.createIcons();
+                showStatus('Exited fullscreen', 'success');
             }
         }
 
-        // Event listeners setup
+        // Enhanced event listeners setup
         function setupEventListeners() {
+            // Theme toggle
             document.getElementById('theme-toggle').addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
-                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+                showStatus(`Switched to ${newTheme} theme`, 'success');
             });
             
+            // Sidebar toggle
             document.getElementById('sidebar-toggle').addEventListener('click', () => {
                 const sidebar = document.getElementById('sidebar');
                 sidebar.classList.toggle('collapsed');
@@ -918,37 +1508,83 @@ body {
                 const isCollapsed = sidebar.classList.contains('collapsed');
                 sidebarIcon.setAttribute('data-lucide', isCollapsed ? 'sidebar-open' : 'sidebar');
                 lucide.createIcons();
+                showStatus(`Sidebar ${isCollapsed ? 'collapsed' : 'expanded'}`, 'success');
             });
 
-            document.getElementById('save-btn').addEventListener('click', saveToHistory);
+            // Tool buttons
+            document.getElementById('save-btn').addEventListener('click', () => {
+                const savedItem = saveToHistory();
+                if (savedItem) {
+                    showStatus('Saved to history', 'success');
+                }
+            });
+            
             document.getElementById('format-btn').addEventListener('click', formatCode);
             document.getElementById('minify-btn').addEventListener('click', minifyCode);
             document.getElementById('import-btn').addEventListener('click', importFile);
             document.getElementById('export-btn').addEventListener('click', exportFile);
+            
+            // Preview controls
             document.getElementById('preview-btn').addEventListener('click', () => {
-                document.getElementById('preview-container').style.display = 'flex';
-                updatePreview();
+                const previewContainer = document.getElementById('preview-container');
+                const isVisible = previewContainer.style.display !== 'none';
+                previewContainer.style.display = isVisible ? 'none' : 'flex';
+                document.getElementById('preview-btn').innerHTML = 
+                    `<i data-lucide="${isVisible ? 'eye' : 'eye-off'}" class="btn-icon"></i>`;
+                lucide.createIcons();
+                if (!isVisible) updatePreview();
+                showStatus(`Preview ${isVisible ? 'hidden' : 'shown'}`, 'success');
             });
+            
             document.getElementById('close-preview').addEventListener('click', () => {
                 document.getElementById('preview-container').style.display = 'none';
+                document.getElementById('preview-btn').innerHTML = 
+                    '<i data-lucide="eye" class="btn-icon"></i>';
+                lucide.createIcons();
+                showStatus('Preview closed', 'success');
             });
+            
             document.getElementById('new-tab-btn').addEventListener('click', openInNewTab);
             document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
             
+            // History controls
             document.getElementById('clear-history').addEventListener('click', () => {
                 showPopup(
-                    'Clear History',
-                    'Are you sure you want to clear all history? This action cannot be undone.',
+                    'Clear All History',
+                    'Are you sure you want to clear all history items? This action cannot be undone.',
                     () => {
                         state.history = [];
                         localStorage.removeItem('editor-history');
                         renderHistory();
+                        showStatus('History cleared', 'success');
                     }
                 );
             });
 
-            document.getElementById('popup-cancel').addEventListener('click', () => {
-                document.getElementById('popup-overlay').classList.remove('active');
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                    e.preventDefault();
+                    exportFile();
+                }
+                
+                if (e.ctrlKey && e.key === 'o') {
+                    e.preventDefault();
+                    importFile();
+                }
+                
+                if (e.ctrlKey && e.key === 'b') {
+                    e.preventDefault();
+                    document.getElementById('sidebar-toggle').click();
+                }
+            });
+
+            // Fullscreen change listener
+            document.addEventListener('fullscreenchange', () => {
+                const icon = document.getElementById('fullscreen-btn').querySelector('[data-lucide]');
+                const isFullscreen = !!document.fullscreenElement;
+                icon.setAttribute('data-lucide', isFullscreen ? 'minimize' : 'maximize');
+                lucide.createIcons();
             });
         }
 
@@ -957,8 +1593,12 @@ body {
         const systemTheme = detectSystemTheme();
         setTheme(savedTheme || systemTheme);
 
-        // Start the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Start the app
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
     </script>
 </body>
 </html>
